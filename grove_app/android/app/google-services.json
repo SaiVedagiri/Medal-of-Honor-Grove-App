@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "155990385801",
+    "firebase_url": "https://honor-grove-app.firebaseio.com",
+    "project_id": "honor-grove-app",
+    "storage_bucket": "honor-grove-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155990385801:android:c50439fe47c409e13f5258",
+        "android_client_info": {
+          "package_name": "us.macrotechsolutions.groveapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "155990385801-a1ukkhq1mv8l91083sk0tr0uq36hd56b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "us.macrotechsolutions.groveapp",
+            "certificate_hash": "01b7e43ddd5c72e5f923819c74744c989c8251ce"
+          }
+        },
+        {
+          "client_id": "155990385801-e4lu1td6s5vdks6njuarn268oud5klf3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX8scobvf7tPxVN8ElQZipACEtYIjdP1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "155990385801-e4lu1td6s5vdks6njuarn268oud5klf3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

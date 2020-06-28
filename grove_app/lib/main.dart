@@ -5,7 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:flutube/flutube.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
+import 'package:location/location.dart';
+
+var _firebaseRef = FirebaseDatabase().reference();
 
 void main() {
   runApp(MyApp());
@@ -27,9 +33,9 @@ class MyApp extends StatelessWidget {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     var result = snapshot.data;
-                    return MyHomePage(title: 'Grove App');
+                    return HomePage();
                   } else {
-                    return MyHomePage(title: 'Grove App');
+                    return HomePage();
                   }
                 },
               ),
@@ -40,16 +46,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   Future<String> createAlertDialog(
       BuildContext context, String title, String body) {
     return showDialog(
@@ -98,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Grove App"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help),
@@ -168,9 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class VideoPage extends StatefulWidget {
-  VideoPage({Key key, this.title}) : super(key: key);
+  VideoPage({Key key}) : super(key: key);
 
-  final String title;
 
   @override
   _VideoPageState createState() => _VideoPageState();
@@ -316,12 +319,14 @@ class _VideoPageState extends State<VideoPage> {
             IconButton(
               icon: Icon(Icons.videocam),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, "/video");
+
               },
             ),
             IconButton(
               icon: Icon(Icons.map),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/map");
+              },
             ),
             IconButton(
               icon: Icon(Icons.add_shopping_cart),
@@ -336,36 +341,18 @@ class _VideoPageState extends State<VideoPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-//            YoutubePlayer(
-//              controller: _controller,
-//              showVideoProgressIndicator: true,
-//              progressIndicatorColor: Colors.blueAccent,
-//              topActions: <Widget>[
-//                const SizedBox(width: 8.0),
-//                Expanded(
-//                  child: Text(
-//                    _controller.metadata.title,
-//                    style: const TextStyle(
-//                      color: Colors.white,
-//                      fontSize: 18.0,
-//                    ),
-//                    overflow: TextOverflow.ellipsis,
-//                    maxLines: 1,
-//                  ),
-//                ),
-//              ],
-//              onReady: () {
-//                _isPlayerReady = true;
-//              },
-//            ),
-            FluTube(
-              'https://www.youtube.com/watch?v=VDJOSB3bj2Q',
-              aspectRatio: 16 / 9,
-              autoPlay: true,
-              looping: false,
-              onVideoStart: () {},
-              onVideoEnd: () {},
-            )
+            YoutubePlayer(
+              controller: _controller,
+              showVideoProgressIndicator: true,
+              progressIndicatorColor: Colors.blueAccent,
+              bottomActions: [
+                CurrentPosition(),
+                ProgressBar(isExpanded: true),
+              ],
+              onReady: () {
+                _isPlayerReady = true;
+              },
+            ),
           ],
         ),
       ),
@@ -374,15 +361,57 @@ class _VideoPageState extends State<VideoPage> {
 }
 
 class MapPage extends StatefulWidget {
-  MapPage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  MapPage({Key key}) : super(key: key);
 
   @override
   _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
+  Location location;
+  bool serviceEnabled;
+  PermissionStatus permissionGranted;
+  LocationData locationData;
+  GoogleMapController mapController;
+
+  void _onMapCreated(GoogleMapController controller) async {
+    mapController = controller;
+    location = new Location();
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return;
+      }
+    }
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    LocationData tempLocationData = await location.getLocation();
+    setState(() {
+      locationData = tempLocationData;
+    });
+    print("Latitude: ${locationData.latitude}");
+    print("Longitude: ${locationData.longitude}");
+    location.onLocationChanged.listen((LocationData currentLocation) async {
+      LocationData tempLocationData = await location.getLocation();
+      print("Latitude: ${locationData.latitude}");
+      print("Longitude: ${locationData.longitude}");
+    });
+    location.onLocationChanged.timeout(Duration(seconds: 5));
+  }
+
+  @override
+  void dispose(){
+
+    super.dispose();
+  }
+
   Future<String> createAlertDialog(
       BuildContext context, String title, String body) {
     return showDialog(
@@ -431,7 +460,7 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Grove Map"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help),
@@ -490,10 +519,12 @@ class _MapPageState extends State<MapPage> {
           ],
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        mapType: MapType.hybrid,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(locationData != null ? locationData.latitude : 45.521563, locationData != null ? locationData.longitude: -122.677433),
+          zoom: 11.0,
         ),
       ),
     );
@@ -501,9 +532,7 @@ class _MapPageState extends State<MapPage> {
 }
 
 class TreasurePage extends StatefulWidget {
-  TreasurePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  TreasurePage({Key key}) : super(key: key);
 
   @override
   _TreasurePageState createState() => _TreasurePageState();
@@ -558,7 +587,7 @@ class _TreasurePageState extends State<TreasurePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Grove Treasure Hunt"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help),

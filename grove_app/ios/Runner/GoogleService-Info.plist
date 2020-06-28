@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>155990385801-3doigo6pcmspb9g8pk7o5ejq7u3hn1ik.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.155990385801-3doigo6pcmspb9g8pk7o5ejq7u3hn1ik</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>155990385801-a1ukkhq1mv8l91083sk0tr0uq36hd56b.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCAM_fOk-tMcq12i3KLNHV5_rezksokxEk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>155990385801</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>us.macrotechsolutions.groveapp</string>
+	<key>PROJECT_ID</key>
+	<string>honor-grove-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>honor-grove-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:155990385801:ios:30f67e9a540d86d93f5258</string>
+	<key>DATABASE_URL</key>
+	<string>https://honor-grove-app.firebaseio.com</string>
+</dict>
+</plist>
