@@ -38,6 +38,13 @@
             {
               "client_id": "155990385801-e4lu1td6s5vdks6njuarn268oud5klf3.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "155990385801-3doigo6pcmspb9g8pk7o5ejq7u3hn1ik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "us.macrotechsolutions.groveapp"
+              }
             }
           ]
         }
