@@ -15,6 +15,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 var _firebaseRef = FirebaseDatabase().reference();
 FlutterTts flutterTts = FlutterTts();
 var result = "";
+var popupShown = false;
+var timePressed;
 
 var firebaseData;
 
@@ -390,9 +392,10 @@ class _MapPageState extends State<MapPage> {
   PermissionStatus permissionGranted;
   LocationData locationData;
   GoogleMapController mapController;
-  double latitude = 45.0;
-  double longitude = -122.0;
+  double latitude = 40.436689;
+  double longitude = -74.230622;
   final Map<String, Marker> _markers = {};
+  BitmapDescriptor pinLocation;
 
   @override
   initState() {
@@ -401,6 +404,9 @@ class _MapPageState extends State<MapPage> {
 
   void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
+    pinLocation = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5),
+        'assets/currentLocation.png');
     location = new Location();
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
@@ -435,9 +441,6 @@ class _MapPageState extends State<MapPage> {
       return d;
     }
 
-    print(locationData.latitude);
-    print(locationData.longitude);
-
     firebaseData.keys.forEach((var key) {
       print(firebaseData[key]["latitude"]);
       print(firebaseData[key]["longitude"]);
@@ -446,67 +449,8 @@ class _MapPageState extends State<MapPage> {
           locationData.latitude, locationData.longitude,
           firebaseData[key]["latitude"], firebaseData[key]["longitude"]) < 1000) {
         var body = "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                  title: Text("Location Near"),
-                  content: Text(body),
-                  actions: <Widget>[
-                    MaterialButton(
-                      elevation: 5.0,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) =>
-                                new DetailsPage(
-                                    title: firebaseData[key]["name"], info: firebaseData[key]["text"])));
-                      },
-                      child: Text("OK"),
-                    ),
-                    MaterialButton(
-                      elevation: 5.0,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("Cancel"),
-                    )
-                  ]);
-            });
-      }
-    });
-
-    setState(() {
-      latitude = locationData.latitude;
-      longitude = locationData.longitude;
-    });
-    location.onLocationChanged.listen((LocationData currentLocation) async {
-      LocationData tempLocationData = await location.getLocation();
-
-      double deg2rad(deg) {
-        return deg * (pi / 180);
-      }
-
-      double getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-        var R = 6371; // Radius of the earth in km
-        var dLat = deg2rad(lat2 - lat1); // deg2rad below
-        var dLon = deg2rad(lon2 - lon1);
-        var a = sin(dLat / 2) * sin(dLat / 2) +
-            cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * sin(dLon / 2) *
-                sin(dLon / 2);
-        var c = 2 * atan2(sqrt(a), sqrt(1 - a));
-        var d = R * c; // Distance in km
-        return d;
-      }
-
-      firebaseData.keys.forEach((var key) {
-        if (getDistanceFromLatLonInKm(
-            tempLocationData.latitude, tempLocationData.longitude,
-            firebaseData[key]["latitude"], firebaseData[key]["longitude"]) <
-            10) {
-          var body = "You are about ${1000 * getDistanceFromLatLonInKm(tempLocationData.latitude, tempLocationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to view details.";
+        if (!popupShown && (timePressed == null || new DateTime.now().isAfter(timePressed))) {
+          popupShown = true;
           showDialog(
               context: context,
               builder: (context) {
@@ -517,19 +461,24 @@ class _MapPageState extends State<MapPage> {
                       MaterialButton(
                         elevation: 5.0,
                         onPressed: () {
+                          popupShown = false;
+                          timePressed = new DateTime.now().add(new Duration(minutes: 1));
                           Navigator.of(context).pop();
                           Navigator.push(
                               context,
                               new MaterialPageRoute(
                                   builder: (context) =>
                                   new DetailsPage(
-                                      title: firebaseData[key]["name"], info: firebaseData[key]["text"])));
+                                      title: firebaseData[key]["name"],
+                                      info: firebaseData[key]["text"])));
                         },
                         child: Text("OK"),
                       ),
                       MaterialButton(
                         elevation: 5.0,
                         onPressed: () {
+                          popupShown = false;
+                          timePressed = new DateTime.now().add(new Duration(minutes: 1));
                           Navigator.of(context).pop();
                         },
                         child: Text("Cancel"),
@@ -537,55 +486,114 @@ class _MapPageState extends State<MapPage> {
                     ]);
               });
         }
-      });
+      }
+    });
 
-      setState(() {
-        _markers.clear();
-        var marker = Marker(
-          markerId: MarkerId("currentLocation"),
-          position: LatLng(latitude, longitude),
+    setState(() {
+      latitude = locationData.latitude;
+      longitude = locationData.longitude;
+    });
+
+    location.onLocationChanged.listen((LocationData currentLocation) async {
+      try {
+        LocationData tempLocationData = await location.getLocation();
+
+        firebaseData.keys.forEach((var key) {
+          print(firebaseData[key]["latitude"]);
+          print(firebaseData[key]["longitude"]);
+          print(getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"]));
+          if (getDistanceFromLatLonInKm(
+              locationData.latitude, locationData.longitude,
+              firebaseData[key]["latitude"], firebaseData[key]["longitude"]) < 1000) {
+            var body = "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
+            if (!popupShown && (timePressed == null || new DateTime.now().isAfter(timePressed))) {
+              popupShown = true;
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                        title: Text("Location Near"),
+                        content: Text(body),
+                        actions: <Widget>[
+                          MaterialButton(
+                            elevation: 5.0,
+                            onPressed: () {
+                              popupShown = false;
+                              timePressed = new DateTime.now().add(new Duration(minutes: 1));
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                  context,
+                                  new MaterialPageRoute(
+                                      builder: (context) =>
+                                      new DetailsPage(
+                                          title: firebaseData[key]["name"],
+                                          info: firebaseData[key]["text"])));
+                            },
+                            child: Text("OK"),
+                          ),
+                          MaterialButton(
+                            elevation: 5.0,
+                            onPressed: () {
+                              popupShown = false;
+                              timePressed = new DateTime.now().add(new Duration(minutes: 1));
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("Cancel"),
+                          )
+                        ]);
+                  });
+            }
+          }
+        });
+
+        setState(() {
+          _markers.clear();
+          var marker = Marker(
+            markerId: MarkerId("currentLocation"),
+            icon: pinLocation,
+            position: LatLng(latitude, longitude),
+            infoWindow: InfoWindow(
+              title: "Current Location",
+            ),
+          );
+          _markers["currentLocation"] = marker;
+
+          firebaseData.keys.forEach((var key) {
+            var newMarker = Marker(
+          markerId: MarkerId(key),
+          position: LatLng(firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
           infoWindow: InfoWindow(
-            title: "Current Location",
+            title: firebaseData[key]["name"],
           ),
         );
-        _markers["currentLocation"] = marker;
-
-//      for (var office in locations.offices) {
-//        var newMarker = Marker(
-//          markerId: MarkerId(office.name),
-//          position: LatLng(office.lat, office.lng),
-//          infoWindow: InfoWindow(
-//            title: office.name,
-//            snippet: office.address,
-//          ),
-//        );
-//        _markers[office.name] = newMarker;
-//      }
-      });
-    });
+        _markers[key] = newMarker;
+          });
+        });
+    }
+    catch(ex){}});
 
     setState(() {
       _markers.clear();
       var marker = Marker(
         markerId: MarkerId("currentLocation"),
         position: LatLng(latitude, longitude),
+        icon: pinLocation,
         infoWindow: InfoWindow(
           title: "Current Location",
         ),
       );
       _markers["currentLocation"] = marker;
 
-//      for (var office in locations.offices) {
-//        var newMarker = Marker(
-//          markerId: MarkerId(office.name),
-//          position: LatLng(office.lat, office.lng),
-//          infoWindow: InfoWindow(
-//            title: office.name,
-//            snippet: office.address,
-//          ),
-//        );
-//        _markers[office.name] = newMarker;
-//      }
+      firebaseData.keys.forEach((var key) {
+        var newMarker = Marker(
+          markerId: MarkerId(key),
+          position: LatLng(firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
+          infoWindow: InfoWindow(
+            title: firebaseData[key]["name"],
+          ),
+        );
+        _markers[key] = newMarker;
+      });
     });
 
     location.onLocationChanged.timeout(Duration(seconds: 5));
@@ -778,8 +786,8 @@ class _MapPageState extends State<MapPage> {
               onMapCreated: _onMapCreated,
               mapType: MapType.hybrid,
               initialCameraPosition: CameraPosition(
-                target: LatLng(40.4367445053398, -74.23047140991979),
-                zoom: 11.0,
+                target: LatLng(latitude, longitude),
+                zoom: 17.0,
               ),
               markers: _markers.values.toSet(),
             ),

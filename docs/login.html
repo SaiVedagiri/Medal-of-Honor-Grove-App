@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,
+            shrink-to-fit=no">
+        <title>Grove App</title>
+        <link rel="stylesheet"
+            href="/assets/bootstrap/css/bootstrap.min.css?h=3a42ae1a0cf2675813bd0fd1f6fa0332">
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.1.1/aos.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        <link rel="stylesheet"
+            href="/assets/css/styles.min.css?h=218b202dd9675a5b5cefe9bd6486929f">
+        <script  src="/assets/js/loginScripts.js" defer></script>
+        <script  src="/assets/js/bcrypt.min.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+        <script
+            src="https://www.gstatic.com/firebasejs/7.16.0/firebase-database.js"></script>
+         <script   src="https://www.gstatic.com/firebasejs/7.16.0/firebase-database.js"></script>
+        <script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyByBnjhEtjWKQQ4bAqLmYLMk-iqiwsjoiA",
+    authDomain: "honor-grove-app.firebaseapp.com",
+    databaseURL: "https://honor-grove-app.firebaseio.com",
+    projectId: "honor-grove-app",
+    storageBucket: "honor-grove-app.appspot.com",
+    messagingSenderId: "155990385801",
+    appId: "1:155990385801:web:1384ebf317974cd43f5258",
+    measurementId: "G-YT1T4ETEYL"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.database();
+</script>
+    </head>
+
+    <body>
+        <!-- Start: Login Form Dark -->
+        <div class="login-dark">
+            <form>
+                <h2 class="sr-only">Login Form</h2>
+                <div class="illustration"><i class="icon
+                        ion-ios-locked-outline"></i></div>
+                <div class="form-group"><h2 id="error" style="text-align: center; font-size: 20px"></h2></div>
+                <div class="form-group"><input id="usernameInput" class="form-control" placeholder="Username"></div>
+                <div class="form-group"><input id="passwordInput" class="form-control"
+                        type="password" name="password" placeholder="Password"></div>
+                <div><button class="btn btn-primary
+                        btn-block" onclick="signInEmail(event)">Log In</button></div></form>
+        </div>
+        <!-- End: Login Form Dark -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.1.1/aos.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+        <script
+            src="/assets/js/script.min.js?h=d6a3d7e390d1bd7c245c354c1acf8f60"></script>
+    </body>
+
+</html>
