@@ -40,7 +40,7 @@ function newLocationAdd() {
         let longitude = parseInt(document.getElementById("addLongitude").value);
         let details = document.getElementById("addDetails").value;
         let social = document.getElementById("addSocial").value;
-        let qr = Math.round(Math.random() * 10000000000);
+        let qr = Math.round(Math.random() * 10000000000).toString();
 
         if (latitude != NaN && latitude > -90 && latitude < 90 && longitude != NaN && longitude > -180 && longitude < 180 && name != "") {
             firebase.database().ref("locations").push({
