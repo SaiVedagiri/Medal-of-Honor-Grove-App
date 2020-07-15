@@ -1,6 +1,9 @@
 var database = firebase.database();
 const bcrypt = dcodeIO.bcrypt;
 sessionStorage.setItem('valid','false');
+var loggedIn = {
+    value: false
+};
 
 async function signInEmail(event) {
     event.preventDefault();
@@ -17,6 +20,7 @@ async function signInEmail(event) {
         }
         if (bcrypt.compareSync(inputPassword, userPassword)) {
             sessionStorage.setItem('valid','true');
+            console.log(loggedIn);
             window.location.href = "admin.html";
         } else {
             console.log(hash(inputPassword));

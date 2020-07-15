@@ -17,8 +17,10 @@ FlutterTts flutterTts = FlutterTts();
 var result = "";
 var popupShown = false;
 var timePressed;
+var prefs;
 
 var firebaseData;
+var scavengerData;
 
 void main() {
   runApp(MyApp());
@@ -35,8 +37,7 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         routes: {
-          "/": (_) =>
-              StreamBuilder(
+          "/": (_) => StreamBuilder(
                 stream: getLinksStream(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -74,10 +75,17 @@ class _HomePageState extends State<HomePage> {
     ref.child("locations").once().then((DataSnapshot data) {
       firebaseData = data.value;
     });
+    ref.child("Scavenger").once().then((DataSnapshot data) {
+      scavengerData = data.value;
+    });
+    prefs = await SharedPreferences.getInstance();
+    if (prefs.getInt('treasureNum') == null) {
+      prefs.setInt('treasureNum', 1);
+    }
   }
 
-  Future<String> createAlertDialog(BuildContext context, String title,
-      String body) {
+  Future<String> createAlertDialog(
+      BuildContext context, String title, String body) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -249,8 +257,8 @@ class _VideoPageState extends State<VideoPage> {
     super.dispose();
   }
 
-  Future<String> createAlertDialog(BuildContext context, String title,
-      String body) {
+  Future<String> createAlertDialog(
+      BuildContext context, String title, String body) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -434,7 +442,9 @@ class _MapPageState extends State<MapPage> {
       var dLat = deg2rad(lat2 - lat1); // deg2rad below
       var dLon = deg2rad(lon2 - lon1);
       var a = sin(dLat / 2) * sin(dLat / 2) +
-          cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * sin(dLon / 2) *
+          cos(deg2rad(lat1)) *
+              cos(deg2rad(lat2)) *
+              sin(dLon / 2) *
               sin(dLon / 2);
       var c = 2 * atan2(sqrt(a), sqrt(1 - a));
       var d = R * c; // Distance in km
@@ -444,12 +454,21 @@ class _MapPageState extends State<MapPage> {
     firebaseData.keys.forEach((var key) {
       print(firebaseData[key]["latitude"]);
       print(firebaseData[key]["longitude"]);
-      print(getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"]));
+      print(getDistanceFromLatLonInKm(
+          locationData.latitude,
+          locationData.longitude,
+          firebaseData[key]["latitude"],
+          firebaseData[key]["longitude"]));
       if (getDistanceFromLatLonInKm(
-          locationData.latitude, locationData.longitude,
-          firebaseData[key]["latitude"], firebaseData[key]["longitude"]) < 1000) {
-        var body = "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
-        if (!popupShown && (timePressed == null || new DateTime.now().isAfter(timePressed))) {
+              locationData.latitude,
+              locationData.longitude,
+              firebaseData[key]["latitude"],
+              firebaseData[key]["longitude"]) <
+          1000) {
+        var body =
+            "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
+        if (!popupShown &&
+            (timePressed == null || new DateTime.now().isAfter(timePressed))) {
           popupShown = true;
           showDialog(
               context: context,
@@ -462,13 +481,13 @@ class _MapPageState extends State<MapPage> {
                         elevation: 5.0,
                         onPressed: () {
                           popupShown = false;
-                          timePressed = new DateTime.now().add(new Duration(minutes: 1));
+                          timePressed =
+                              new DateTime.now().add(new Duration(minutes: 1));
                           Navigator.of(context).pop();
                           Navigator.push(
                               context,
                               new MaterialPageRoute(
-                                  builder: (context) =>
-                                  new DetailsPage(
+                                  builder: (context) => new DetailsPage(
                                       title: firebaseData[key]["name"],
                                       info: firebaseData[key]["text"])));
                         },
@@ -478,7 +497,8 @@ class _MapPageState extends State<MapPage> {
                         elevation: 5.0,
                         onPressed: () {
                           popupShown = false;
-                          timePressed = new DateTime.now().add(new Duration(minutes: 1));
+                          timePressed =
+                              new DateTime.now().add(new Duration(minutes: 1));
                           Navigator.of(context).pop();
                         },
                         child: Text("Cancel"),
@@ -501,12 +521,22 @@ class _MapPageState extends State<MapPage> {
         firebaseData.keys.forEach((var key) {
           print(firebaseData[key]["latitude"]);
           print(firebaseData[key]["longitude"]);
-          print(getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"]));
+          print(getDistanceFromLatLonInKm(
+              locationData.latitude,
+              locationData.longitude,
+              firebaseData[key]["latitude"],
+              firebaseData[key]["longitude"]));
           if (getDistanceFromLatLonInKm(
-              locationData.latitude, locationData.longitude,
-              firebaseData[key]["latitude"], firebaseData[key]["longitude"]) < 1000) {
-            var body = "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
-            if (!popupShown && (timePressed == null || new DateTime.now().isAfter(timePressed))) {
+                  locationData.latitude,
+                  locationData.longitude,
+                  firebaseData[key]["latitude"],
+                  firebaseData[key]["longitude"]) <
+              1000) {
+            var body =
+                "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
+            if (!popupShown &&
+                (timePressed == null ||
+                    new DateTime.now().isAfter(timePressed))) {
               popupShown = true;
               showDialog(
                   context: context,
@@ -519,13 +549,13 @@ class _MapPageState extends State<MapPage> {
                             elevation: 5.0,
                             onPressed: () {
                               popupShown = false;
-                              timePressed = new DateTime.now().add(new Duration(minutes: 1));
+                              timePressed = new DateTime.now()
+                                  .add(new Duration(minutes: 1));
                               Navigator.of(context).pop();
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) =>
-                                      new DetailsPage(
+                                      builder: (context) => new DetailsPage(
                                           title: firebaseData[key]["name"],
                                           info: firebaseData[key]["text"])));
                             },
@@ -535,7 +565,8 @@ class _MapPageState extends State<MapPage> {
                             elevation: 5.0,
                             onPressed: () {
                               popupShown = false;
-                              timePressed = new DateTime.now().add(new Duration(minutes: 1));
+                              timePressed = new DateTime.now()
+                                  .add(new Duration(minutes: 1));
                               Navigator.of(context).pop();
                             },
                             child: Text("Cancel"),
@@ -560,17 +591,18 @@ class _MapPageState extends State<MapPage> {
 
           firebaseData.keys.forEach((var key) {
             var newMarker = Marker(
-          markerId: MarkerId(key),
-          position: LatLng(firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
-          infoWindow: InfoWindow(
-            title: firebaseData[key]["name"],
-          ),
-        );
-        _markers[key] = newMarker;
+              markerId: MarkerId(key),
+              position: LatLng(firebaseData[key]["latitude"],
+                  firebaseData[key]["longitude"]),
+              infoWindow: InfoWindow(
+                title: firebaseData[key]["name"],
+              ),
+            );
+            _markers[key] = newMarker;
           });
         });
-    }
-    catch(ex){}});
+      } catch (ex) {}
+    });
 
     setState(() {
       _markers.clear();
@@ -587,7 +619,8 @@ class _MapPageState extends State<MapPage> {
       firebaseData.keys.forEach((var key) {
         var newMarker = Marker(
           markerId: MarkerId(key),
-          position: LatLng(firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
+          position: LatLng(
+              firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
           infoWindow: InfoWindow(
             title: firebaseData[key]["name"],
           ),
@@ -611,8 +644,8 @@ class _MapPageState extends State<MapPage> {
     ]);
   }
 
-  Future<String> createAlertDialog(BuildContext context, String title,
-      String body) {
+  Future<String> createAlertDialog(
+      BuildContext context, String title, String body) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -676,8 +709,7 @@ class _MapPageState extends State<MapPage> {
                       Navigator.push(
                           context,
                           new MaterialPageRoute(
-                              builder: (context) =>
-                              new DetailsPage(
+                              builder: (context) => new DetailsPage(
                                   title: locationName, info: locationDetails)));
                     }
                   });
@@ -685,8 +717,7 @@ class _MapPageState extends State<MapPage> {
                     createAlertDialog(context, "Invalid QR Code",
                         "This QR code is not recognized by the Grove app. Please try again.");
                   }
-                }
-                on PlatformException catch (ex) {
+                } on PlatformException catch (ex) {
                   if (ex.code == BarcodeScanner.CameraAccessDenied) {
                     setState(() {
                       createAlertDialog(context, "Scan QR",
@@ -702,7 +733,7 @@ class _MapPageState extends State<MapPage> {
                 } on FormatException {
                   setState(() {
                     result =
-                    "You pressed the back button before scanning anything";
+                        "You pressed the back button before scanning anything";
                     createAlertDialog(
                         context, "Scan QR", "No QR Code was recognized.");
                   });
@@ -774,14 +805,8 @@ class _MapPageState extends State<MapPage> {
       body: Column(
         children: <Widget>[
           Container(
-            height: MediaQuery
-                .of(context)
-                .size
-                .height - 128,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            height: MediaQuery.of(context).size.height - 128,
+            width: MediaQuery.of(context).size.width,
             child: GoogleMap(
               onMapCreated: _onMapCreated,
               mapType: MapType.hybrid,
@@ -806,8 +831,8 @@ class TreasurePage extends StatefulWidget {
 }
 
 class _TreasurePageState extends State<TreasurePage> {
-  Future<String> createAlertDialog(BuildContext context, String title,
-      String body) {
+  Future<String> createAlertDialog(
+      BuildContext context, String title, String body) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -826,6 +851,9 @@ class _TreasurePageState extends State<TreasurePage> {
         });
   }
 
+  var locationKey = "";
+  var locationData = {"name":"", "qr-id":"","text":""};
+
   Future<String> helpContext(BuildContext context, String title, Widget body) {
     return showDialog(
         context: context,
@@ -843,6 +871,21 @@ class _TreasurePageState extends State<TreasurePage> {
                 )
               ]);
         });
+  }
+
+  initState() {
+    super.initState();
+    initStateFunction();
+  }
+
+  initStateFunction() async {
+
+    setState(() {
+      locationKey =
+      scavengerData[prefs.getInt('treasureNum')];
+      print(firebaseData);
+      locationData = firebaseData[locationKey];
+    });
   }
 
   @override
@@ -916,7 +959,61 @@ class _TreasurePageState extends State<TreasurePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+          children: <Widget>[
+            Text(
+                "Location #${prefs.getInt("treasureNum")}: ${locationData["name"]}"),
+            Text("${locationData["text"]}"),
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: FloatingActionButton.extended(
+                  icon: Icon(Icons.camera),
+                  label: Text("Scan QR"),
+                  onPressed: () async {
+                    try {
+                      String qrResult = await BarcodeScanner.scan();
+                      result = qrResult;
+                      if (result != locationData["qr-id"]) {
+                        createAlertDialog(context, "Incorrect QR Code",
+                            "This QR code does not match ${locationData["name"]}. Please try again.");
+                      } else {
+                        prefs.setInt(
+                            'treasureNum', (prefs.getInt('treasureNum') + 1));
+                        Navigator.pushReplacement(
+                            context,
+                            new MaterialPageRoute(
+                                builder: (context) => new SocialPage(
+                                    locationData: json.encode(locationData))));
+                      }
+                    } on PlatformException catch (ex) {
+                      if (ex.code == BarcodeScanner.CameraAccessDenied) {
+                        setState(() {
+                          createAlertDialog(context, "Scan QR",
+                              "Please enable camera permissions for Grove App.");
+                        });
+                      } else {
+                        setState(() {
+                          result = "Unknown Error $ex";
+                          createAlertDialog(
+                              context, "Scan QR", "Unkown Error Occured: $ex");
+                        });
+                      }
+                    } on FormatException {
+                      setState(() {
+                        result =
+                            "You pressed the back button before scanning anything";
+                        createAlertDialog(
+                            context, "Scan QR", "No QR Code was recognized.");
+                      });
+                    } catch (ex) {
+                      setState(() {
+                        result = "Unknown Error $ex";
+                        createAlertDialog(
+                            context, "Scan QR", "Unkown Error Occured: $ex");
+                      });
+                    }
+                  }),
+            ),
+          ],
         ),
       ),
     );
@@ -934,7 +1031,6 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-
   initState() {
     super.initState();
     initStateFunction();
@@ -1014,10 +1110,8 @@ class _DetailsPageState extends State<DetailsPage> {
             Padding(
               padding: const EdgeInsets.only(left: 15.0, right: 15.0),
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: MediaQuery
-                    .of(context)
-                    .size
-                    .height - 350),
+                constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height - 350),
                 child: SingleChildScrollView(
                   child: Container(
                     child: Text(
@@ -1032,8 +1126,7 @@ class _DetailsPageState extends State<DetailsPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
-              child:
-              FloatingActionButton.extended(
+              child: FloatingActionButton.extended(
                   icon: Icon(status == "Play" ? Icons.play_arrow : Icons.pause),
                   label: Text(status),
                   onPressed: () async {
@@ -1048,7 +1141,141 @@ class _DetailsPageState extends State<DetailsPage> {
                         status = "Play";
                       });
                     }
-                  }),),
+                  }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SocialPage extends StatefulWidget {
+  SocialPage({Key key, this.locationData}) : super(key: key);
+
+  final String locationData;
+
+  @override
+  _SocialPageState createState() => _SocialPageState();
+}
+
+class _SocialPageState extends State<SocialPage> {
+  var locationData;
+
+  initState() {
+    super.initState();
+    initStateFunction();
+  }
+
+  initStateFunction() {
+    locationData = json.decode(widget.locationData);
+  }
+
+  Future<String> helpContext(BuildContext context, String title, Widget body) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              title: Text(title),
+              content: body,
+              actions: <Widget>[
+                MaterialButton(
+                  elevation: 5.0,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                )
+              ]);
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Share on Social"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () {
+              helpContext(
+                  context,
+                  "Help",
+                  Text.rich(
+                    TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Home Page\n',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
+                        TextSpan(
+                          text: 'Text goes here.\n',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ));
+            },
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.videocam),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/video");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.map),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/map");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.add_shopping_cart),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+                "Congratulations, you found location #${prefs.getInt('treasureNum') - 1}: ${locationData["name"]}! Feel free to post it on social media!"),
+            FlatButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (context) => new TreasurePage()));
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0),
+                    side: BorderSide(color: Colors.white)),
+                color: Colors.grey,
+                child: Text("Continue")),
           ],
         ),
       ),
