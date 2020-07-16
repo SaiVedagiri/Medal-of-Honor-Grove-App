@@ -851,8 +851,8 @@ class _TreasurePageState extends State<TreasurePage> {
         });
   }
 
-  var locationKey = "";
-  var locationData = {"name":"", "qr-id":"","text":""};
+  String locationKey = "";
+  Map<dynamic,dynamic> locationData = {"name":"", "latitude":"","longitude":"","qr-id":"","text":""};
 
   Future<String> helpContext(BuildContext context, String title, Widget body) {
     return showDialog(
@@ -881,10 +881,8 @@ class _TreasurePageState extends State<TreasurePage> {
   initStateFunction() async {
 
     setState(() {
-      locationKey =
-      scavengerData[prefs.getInt('treasureNum')];
-      print(firebaseData);
-      locationData = firebaseData[locationKey];
+      locationKey = scavengerData[prefs.getInt('treasureNum')];
+    locationData = firebaseData[locationKey];
     });
   }
 
@@ -961,8 +959,26 @@ class _TreasurePageState extends State<TreasurePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-                "Location #${prefs.getInt("treasureNum")}: ${locationData["name"]}"),
-            Text("${locationData["text"]}"),
+                "Location #${prefs.getInt("treasureNum")}: ${locationData["name"]}", style: TextStyle(
+              fontSize: 20.0,
+            ),),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height / 2),
+                child: SingleChildScrollView(
+                  child: Container(
+                    child: Text(
+                      '${locationData["text"]}',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: FloatingActionButton.extended(
@@ -1262,20 +1278,33 @@ class _SocialPageState extends State<SocialPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-                "Congratulations, you found location #${prefs.getInt('treasureNum') - 1}: ${locationData["name"]}! Feel free to post it on social media!"),
-            FlatButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
+        Padding(
+        padding: const EdgeInsets.all(30.0),
+            child: Text(
+                "Congratulations, you found location #${prefs.getInt('treasureNum') - 1}: ${locationData["name"]}! Feel free to post it on social media!"),),
+//            FlatButton(
+//                onPressed: () {
+//                  Navigator.pushReplacement(
+//                      context,
+//                      new MaterialPageRoute(
+//                          builder: (context) => new TreasurePage()));
+//                },
+//                shape: RoundedRectangleBorder(
+//                    borderRadius: BorderRadius.circular(24.0),
+//                    side: BorderSide(color: Colors.white)),
+//                color: Colors.grey,
+//                child: Text("Continue")),
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: FloatingActionButton.extended(
+                  label: Text("Continue"),
+                  onPressed: () {
+                    Navigator.pushReplacement(
                       context,
                       new MaterialPageRoute(
                           builder: (context) => new TreasurePage()));
-                },
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0),
-                    side: BorderSide(color: Colors.white)),
-                color: Colors.grey,
-                child: Text("Continue")),
+                  }),
+            ),
           ],
         ),
       ),
