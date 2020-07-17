@@ -26,13 +26,17 @@ dependencies:
   google_maps_flutter: ^0.5.27+3
   shared_preferences: ^0.5.7+2
   barcode_scan: ^1.0.0
-  uni_links: ^0.2.0
   youtube_player_flutter: ^7.0.0+6
   firebase_core: ^0.4.0+6
   firebase_database: ^3.1.1
   intl: ^0.15.8
   location: ^3.0.2
   flutter_tts: ^1.2.6
+  camera: ^0.5.8+2
+  path_provider: ^1.6.11
+  path: ^1.7.0
+  share_extend: ^1.1.9
+
 
 
 

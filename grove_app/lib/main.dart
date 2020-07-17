@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
+import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:barcode_scan/barcode_scan.dart';
-import 'package:uni_links/uni_links.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:location/location.dart';
-import 'dart:math';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:camera/camera.dart';
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_extend/share_extend.dart';
 
 var _firebaseRef = FirebaseDatabase().reference();
 FlutterTts flutterTts = FlutterTts();
@@ -21,8 +25,19 @@ var prefs;
 
 var firebaseData;
 var scavengerData;
+var firstCamera;
 
-void main() {
+Future<void> main() async {
+  // Ensure that plugin services are initialized so that `availableCameras()`
+  // can be called before `runApp()`
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  firstCamera = cameras.first;
+
   runApp(MyApp());
 }
 
@@ -37,17 +52,7 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         routes: {
-          "/": (_) => StreamBuilder(
-                stream: getLinksStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    var result = snapshot.data;
-                    return HomePage();
-                  } else {
-                    return HomePage();
-                  }
-                },
-              ),
+          "/": (_) => HomePage(),
           "/video": (_) => VideoPage(),
           "/map": (_) => MapPage(),
           "/treasure": (_) => TreasurePage(),
@@ -82,6 +87,8 @@ class _HomePageState extends State<HomePage> {
     if (prefs.getInt('treasureNum') == null) {
       prefs.setInt('treasureNum', 1);
     }
+    final cameras = await availableCameras();
+    final firstCamera = cameras.first;
   }
 
   Future<String> createAlertDialog(
@@ -852,7 +859,13 @@ class _TreasurePageState extends State<TreasurePage> {
   }
 
   String locationKey = "";
-  Map<dynamic,dynamic> locationData = {"name":"", "latitude":"","longitude":"","qr-id":"","text":""};
+  Map<dynamic, dynamic> locationData = {
+    "name": "",
+    "latitude": "",
+    "longitude": "",
+    "qr-id": "",
+    "text": ""
+  };
 
   Future<String> helpContext(BuildContext context, String title, Widget body) {
     return showDialog(
@@ -879,10 +892,9 @@ class _TreasurePageState extends State<TreasurePage> {
   }
 
   initStateFunction() async {
-
     setState(() {
       locationKey = scavengerData[prefs.getInt('treasureNum')];
-    locationData = firebaseData[locationKey];
+      locationData = firebaseData[locationKey];
     });
   }
 
@@ -957,79 +969,106 @@ class _TreasurePageState extends State<TreasurePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-                "Location #${prefs.getInt("treasureNum")}: ${locationData["name"]}", style: TextStyle(
-              fontSize: 20.0,
-            ),),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height / 2),
-                child: SingleChildScrollView(
-                  child: Container(
+          children: (scavengerData.length > prefs.getInt("treasureNum"))
+              ? <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
                     child: Text(
-                      '${locationData["text"]}',
+                      "Location #${prefs.getInt("treasureNum")}: ${locationData["name"]}",
                       style: TextStyle(
                         fontSize: 20.0,
                       ),
                     ),
                   ),
-                ),
-              ),
-            ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height / 2),
+                      child: SingleChildScrollView(
+                        child: Container(
+                          child: Text(
+                            '${locationData["text"]}',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30.0),
+                    child: FloatingActionButton.extended(
+                        icon: Icon(Icons.camera),
+                        label: Text("Scan QR"),
+                        onPressed: () async {
+                          try {
+                            String qrResult = await BarcodeScanner.scan();
+                            result = qrResult;
+                            if (result != locationData["qr-id"]) {
+                              createAlertDialog(context, "Incorrect QR Code",
+                                  "This QR code does not match ${locationData["name"]}. Please try again.");
+                            } else {
+                              prefs.setInt('treasureNum',
+                                  (prefs.getInt('treasureNum') + 1));
+                              Navigator.pushReplacement(
+                                  context,
+                                  new MaterialPageRoute(
+                                      builder: (context) => new SocialPage(
+                                          locationData:
+                                              json.encode(locationData))));
+                            }
+                          } on PlatformException catch (ex) {
+                            if (ex.code == BarcodeScanner.CameraAccessDenied) {
+                              setState(() {
+                                createAlertDialog(context, "Scan QR",
+                                    "Please enable camera permissions for Grove App.");
+                              });
+                            } else {
+                              setState(() {
+                                result = "Unknown Error $ex";
+                                createAlertDialog(context, "Scan QR",
+                                    "Unkown Error Occured: $ex");
+                              });
+                            }
+                          } on FormatException {
+                            setState(() {
+                              result =
+                                  "You pressed the back button before scanning anything";
+                              createAlertDialog(context, "Scan QR",
+                                  "No QR Code was recognized.");
+                            });
+                          } catch (ex) {
+                            setState(() {
+                              result = "Unknown Error $ex";
+                              createAlertDialog(context, "Scan QR",
+                                  "Unkown Error Occured: $ex");
+                            });
+                          }
+                        }),
+                  ),
+                ]
+              : <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                        "Congratulations! You have completed the scavenger hunt."),
+                  ),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: FloatingActionButton.extended(
-                  icon: Icon(Icons.camera),
-                  label: Text("Scan QR"),
+                  icon: Icon(Icons.refresh),
+                  label: Text("Restart"),
                   onPressed: () async {
-                    try {
-                      String qrResult = await BarcodeScanner.scan();
-                      result = qrResult;
-                      if (result != locationData["qr-id"]) {
-                        createAlertDialog(context, "Incorrect QR Code",
-                            "This QR code does not match ${locationData["name"]}. Please try again.");
-                      } else {
-                        prefs.setInt(
-                            'treasureNum', (prefs.getInt('treasureNum') + 1));
-                        Navigator.pushReplacement(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) => new SocialPage(
-                                    locationData: json.encode(locationData))));
-                      }
-                    } on PlatformException catch (ex) {
-                      if (ex.code == BarcodeScanner.CameraAccessDenied) {
-                        setState(() {
-                          createAlertDialog(context, "Scan QR",
-                              "Please enable camera permissions for Grove App.");
-                        });
-                      } else {
-                        setState(() {
-                          result = "Unknown Error $ex";
-                          createAlertDialog(
-                              context, "Scan QR", "Unkown Error Occured: $ex");
-                        });
-                      }
-                    } on FormatException {
-                      setState(() {
-                        result =
-                            "You pressed the back button before scanning anything";
-                        createAlertDialog(
-                            context, "Scan QR", "No QR Code was recognized.");
-                      });
-                    } catch (ex) {
-                      setState(() {
-                        result = "Unknown Error $ex";
-                        createAlertDialog(
-                            context, "Scan QR", "Unkown Error Occured: $ex");
-                      });
-                    }
+                    setState((){
+                      prefs.setInt('treasureNum', 1);
+                      locationKey = scavengerData[prefs.getInt('treasureNum')];
+                      locationData = firebaseData[locationKey];
+                    });
                   }),
             ),
-          ],
+                ],
         ),
       ),
     );
@@ -1278,35 +1317,195 @@ class _SocialPageState extends State<SocialPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-        Padding(
-        padding: const EdgeInsets.all(30.0),
-            child: Text(
-                "Congratulations, you found location #${prefs.getInt('treasureNum') - 1}: ${locationData["name"]}! Feel free to post it on social media!"),),
-//            FlatButton(
-//                onPressed: () {
-//                  Navigator.pushReplacement(
-//                      context,
-//                      new MaterialPageRoute(
-//                          builder: (context) => new TreasurePage()));
-//                },
-//                shape: RoundedRectangleBorder(
-//                    borderRadius: BorderRadius.circular(24.0),
-//                    side: BorderSide(color: Colors.white)),
-//                color: Colors.grey,
-//                child: Text("Continue")),
             Padding(
-              padding: const EdgeInsets.only(top: 30.0),
+              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+              child: Text(
+                  "Congratulations, you found location #${prefs.getInt('treasureNum') - 1}: ${locationData["name"]}! Feel free to post it on social media!"),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
               child: FloatingActionButton.extended(
+                  heroTag: "continueBtn",
                   label: Text("Continue"),
                   onPressed: () {
                     Navigator.pushReplacement(
-                      context,
-                      new MaterialPageRoute(
-                          builder: (context) => new TreasurePage()));
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new TreasurePage()));
+                  }),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: FloatingActionButton.extended(
+                  heroTag: "shareBtn",
+                  backgroundColor: Colors.blueAccent,
+                  icon: Icon(Icons.share),
+                  label: Text("Share"),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                          builder: (context) => new TakePictureScreen(
+                              // Pass the appropriate camera to the TakePictureScreen widget.
+                              camera: firstCamera,
+                              locationName: locationData["name"],
+                              socialText: locationData["social"]),
+                        ));
                   }),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// A screen that allows users to take a picture using a given camera.
+class TakePictureScreen extends StatefulWidget {
+  final CameraDescription camera;
+  final String locationName;
+  final String socialText;
+
+  const TakePictureScreen(
+      {Key key, @required this.camera, this.locationName, this.socialText})
+      : super(key: key);
+
+  @override
+  TakePictureScreenState createState() => TakePictureScreenState();
+}
+
+class TakePictureScreenState extends State<TakePictureScreen> {
+  CameraController _controller;
+  Future<void> _initializeControllerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // To display the current output from the Camera,
+    // create a CameraController.
+    _controller = CameraController(
+      // Get a specific camera from the list of available cameras.
+      widget.camera,
+      // Define the resolution to use.
+      ResolutionPreset.medium,
+    );
+
+    // Next, initialize the controller. This returns a Future.
+    _initializeControllerFuture = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed.
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Take a picture')),
+      // Wait until the controller is initialized before displaying the
+      // camera preview. Use a FutureBuilder to display a loading spinner
+      // until the controller has finished initializing.
+      body: FutureBuilder<void>(
+        future: _initializeControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If the Future is complete, display the preview.
+            return CameraPreview(_controller);
+          } else {
+            // Otherwise, display a loading indicator.
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.camera_alt),
+        // Provide an onPressed callback.
+        onPressed: () async {
+          // Take the Picture in a try / catch block. If anything goes wrong,
+          // catch the error.
+          try {
+            // Ensure that the camera is initialized.
+            await _initializeControllerFuture;
+
+            // Construct the path where the image should be saved using the
+            // pattern package.
+            final path = join(
+              // Store the picture in the temp directory.
+              // Find the temp directory using the `path_provider` plugin.
+              (await getTemporaryDirectory()).path,
+              '${DateTime.now()}.png',
+            );
+
+            // Attempt to take a picture and log where it's been saved.
+            await _controller.takePicture(path);
+
+            // If the picture was taken, display it on a new screen.
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DisplayPictureScreen(
+                    imagePath: path,
+                    socialText: widget.socialText,
+                    locationName: widget.locationName),
+              ),
+            );
+          } catch (e) {
+            // If an error occurs, log the error to the console.
+            print(e);
+          }
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
+
+class DisplayPictureScreen extends StatefulWidget {
+  final String imagePath;
+  final String socialText;
+  final String locationName;
+
+  const DisplayPictureScreen(
+      {Key key, this.imagePath, this.socialText, this.locationName})
+      : super(key: key);
+
+  @override
+  DisplayPictureScreenState createState() => DisplayPictureScreenState();
+}
+
+// A widget that displays the picture taken by the user.
+class DisplayPictureScreenState extends State<DisplayPictureScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Display the Picture')),
+      // The image is stored as a file on the device. Use the `Image.file`
+      // constructor with the given path to display the image.
+      body: Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.file(File(widget.imagePath)),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: FloatingActionButton.extended(
+                    heroTag: "socialBtn",
+                    backgroundColor: Colors.green,
+                    icon: Icon(Icons.share),
+                    label: Text("Share"),
+                    onPressed: () async {
+                      await ShareExtend.share(widget.imagePath, "image",
+                          sharePanelTitle: "Grove App",
+                          subject: widget.locationName,
+                          extraText: widget.socialText);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    }),
+              ),
+            ]),
       ),
     );
   }
