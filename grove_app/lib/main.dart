@@ -1093,10 +1093,17 @@ class _DetailsPageState extends State<DetailsPage> {
 
   initStateFunction() async {
     await flutterTts.setLanguage("en-US");
-    await flutterTts.setSpeechRate(1.0);
-    await flutterTts.setVolume(1.0);
-    await flutterTts.setPitch(1.0);
-    await flutterTts.isLanguageAvailable("en-US");
+    if(Platform.isIOS){
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setPitch(1.0);
+      await flutterTts.isLanguageAvailable("en-US");
+    } else {
+      await flutterTts.setSpeechRate(1.0);
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setPitch(1.0);
+      await flutterTts.isLanguageAvailable("en-US");
+    }
   }
 
   String status = "Play";
