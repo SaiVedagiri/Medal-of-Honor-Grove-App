@@ -36,8 +36,8 @@ let missing = [];
 function newLocationAdd() {
     if (editScavenger) {
         let name = document.getElementById("addName").value;
-        let latitude = parseInt(document.getElementById("addLatitude").value);
-        let longitude = parseInt(document.getElementById("addLongitude").value);
+        let latitude = parseFloat(document.getElementById("addLatitude").value);
+        let longitude = parseFloat(document.getElementById("addLongitude").value);
         let details = document.getElementById("addDetails").value;
         let social = document.getElementById("addSocial").value;
         let qr = Math.round(Math.random() * 10000000000).toString();
