@@ -84,8 +84,8 @@ function LocationEditPopulate(tableRow) {
 
 function SaveEdit(row) {
     let name = document.getElementById(`editName${row}`).value;
-    let latitude = parseInt(document.getElementById(`editLatitude${row}`).value);
-    let longitude = parseInt(document.getElementById(`editLongitude${row}`).value);
+    let latitude = parseFloat(document.getElementById(`editLatitude${row}`).value);
+    let longitude = parseFloat(document.getElementById(`editLongitude${row}`).value);
     let details = document.getElementById(`editDetails${row}`).value;
     let social = document.getElementById(`editSocial${row}`).value;
     let qr = locations[row][1];
