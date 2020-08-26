@@ -26,6 +26,7 @@ var prefs;
 var firebaseData;
 var scavengerData;
 var firstCamera;
+var videoId;
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -46,7 +47,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Grove App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -82,6 +82,9 @@ class _HomePageState extends State<HomePage> {
     });
     ref.child("Scavenger").once().then((DataSnapshot data) {
       scavengerData = data.value;
+    });
+    ref.child("videoId").once().then((DataSnapshot data) {
+      videoId = data.value;
     });
     prefs = await SharedPreferences.getInstance();
     if (prefs.getInt('treasureNum') == null) {
@@ -139,7 +142,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Grove App"),
+        title: Text("Medal of Honor Grove"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help),
@@ -158,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Text goes here.\n',
+                          text: 'Read the basic information about the Medal of Honor Grove.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -201,7 +204,31 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+          children: <Widget>[
+            Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Image(
+                  image: AssetImage('assets/brochure.jpg'),
+                  height: 200,
+                )),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 30.0, bottom: 30.0, left: 15.0, right: 15.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight:  MediaQuery.of(context).size.height / 2.0 - 100),
+                child: SingleChildScrollView(
+                  child: Container(
+                    child: Text(
+                      'The Medal of Honor Grove is the oldest living memorial honoring more than 3,500 Medal of Honor Recipients. It serves as a beautiful place of remembrance for the brave souls who risked their lives and, in most cases, made the ultimate sacrifice.\n\nWithin the Grove, there is an area of land for each of the 50 states, as well as Puerto Rico and the District of Columbia.  The recipients of each state are identified by name, rank, and service branch on an obelisk.  Recipients are additionally honored with a ground marker engraved with their name, branch of service and the date and location of the act of valor.\n\nThe Grove is owned by Freedoms Foundation at Valley Forge and maintained by the FRIENDS of the MEDAL of HONOR GROVE.',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -227,7 +254,7 @@ class _VideoPageState extends State<VideoPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: 'VDJOSB3bj2Q',
+      initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
           mute: false,
           autoPlay: true,
@@ -324,14 +351,14 @@ class _VideoPageState extends State<VideoPage> {
                     TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                          text: 'Home Page\n',
+                          text: 'Video Page\n',
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Text goes here.\n',
+                          text: 'Watch our video about the Medal of Honor Grove.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -762,14 +789,14 @@ class _MapPageState extends State<MapPage> {
                     TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                          text: 'Home Page\n',
+                          text: 'Map Page\n',
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Text goes here.\n',
+                          text: 'View a map with all labeled locations. Scan a QR code on a location to view the information. If you are close to the location, you will be alerted.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -919,14 +946,14 @@ class _TreasurePageState extends State<TreasurePage> {
                     TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                          text: 'Home Page\n',
+                          text: 'Scavenger Hunt Page\n',
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Text goes here.\n',
+                          text: 'Take part in a scavenger hunt to search for locations. When you find a location, scan the QR code and you will be given a new clue.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -1055,19 +1082,20 @@ class _TreasurePageState extends State<TreasurePage> {
                     child: Text(
                         "Congratulations! You have completed the scavenger hunt."),
                   ),
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: FloatingActionButton.extended(
-                  icon: Icon(Icons.refresh),
-                  label: Text("Restart"),
-                  onPressed: () async {
-                    setState((){
-                      prefs.setInt('treasureNum', 1);
-                      locationKey = scavengerData[prefs.getInt('treasureNum')];
-                      locationData = firebaseData[locationKey];
-                    });
-                  }),
-            ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30.0),
+                    child: FloatingActionButton.extended(
+                        icon: Icon(Icons.refresh),
+                        label: Text("Restart"),
+                        onPressed: () async {
+                          setState(() {
+                            prefs.setInt('treasureNum', 1);
+                            locationKey =
+                                scavengerData[prefs.getInt('treasureNum')];
+                            locationData = firebaseData[locationKey];
+                          });
+                        }),
+                  ),
                 ],
         ),
       ),
@@ -1093,7 +1121,7 @@ class _DetailsPageState extends State<DetailsPage> {
 
   initStateFunction() async {
     await flutterTts.setLanguage("en-US");
-    if(Platform.isIOS){
+    if (Platform.isIOS) {
       await flutterTts.setSpeechRate(0.5);
       await flutterTts.setVolume(1.0);
       await flutterTts.setPitch(1.0);
@@ -1148,14 +1176,14 @@ class _DetailsPageState extends State<DetailsPage> {
                     TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                          text: 'Home Page\n',
+                          text: 'Details Page\n',
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Text goes here.\n',
+                          text: 'View the details of a location.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -1273,14 +1301,14 @@ class _SocialPageState extends State<SocialPage> {
                     TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                          text: 'Home Page\n',
+                          text: 'Social Page\n',
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Text goes here.\n',
+                          text: 'Share a location through your social media platforms.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
