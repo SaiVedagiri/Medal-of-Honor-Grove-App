@@ -996,7 +996,7 @@ class _TreasurePageState extends State<TreasurePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: (scavengerData.length > prefs.getInt("treasureNum"))
+          children: (scavengerData != null && scavengerData.length > prefs.getInt("treasureNum"))
               ? <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(15.0),
