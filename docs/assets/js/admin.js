@@ -1,7 +1,15 @@
+let locations = [];
+let scavenger = [];
+let editScavenger = true;
+let editRow = false;
+let missing = [];
+
+
 if (sessionStorage.getItem("valid") != "true") {
     window.location.href = "login.html"
-} else{
-    firebase.database().ref("locations").on("child_added", function (snapshot, prevChildKey) {
+} else {
+    LocationsPopulate();
+    firebase.database().ref("locations").on("child_added", function(snapshot, prevChildKey) {
         var newPost = snapshot.val();
         let temp = [];
         temp.push(newPost.name);
@@ -15,8 +23,8 @@ if (sessionStorage.getItem("valid") != "true") {
         LocationsPopulate();
         scavengerPopulate();
     });
-    
-    firebase.database().ref("Scavenger").on("child_added", function (snapshot, prevChildKey) {
+
+    firebase.database().ref("Scavenger").on("child_added", function(snapshot, prevChildKey) {
         var newPost = snapshot.val();
         let temp = [];
         temp.push(snapshot.key);
@@ -27,13 +35,8 @@ if (sessionStorage.getItem("valid") != "true") {
     });
 }
 
-let locations = [];
-let scavenger = [];
-let editScavenger = true;
-let editRow = false;
-let missing = [];
-
 function newLocationAdd() {
+    console.log("here");
     if (editScavenger) {
         let name = document.getElementById("addName").value;
         let latitude = parseFloat(document.getElementById("addLatitude").value);
@@ -96,15 +99,13 @@ function SaveEdit(row) {
         temp.push(name, qr, latitude, longitude, details, social, key);
         locations[row] = temp;
 
-        firebase.database().ref("locations").child(key).update(
-            {
-                name: name,
-                latitude: latitude,
-                longitude: longitude,
-                text: details,
-                social: social
-            }
-        );
+        firebase.database().ref("locations").child(key).update({
+            name: name,
+            latitude: latitude,
+            longitude: longitude,
+            text: details,
+            social: social
+        });
         editRow = false;
 
         LocationsPopulate();
@@ -123,8 +124,21 @@ function LocationDeletePopulate(row) {
         var retVal = confirm(`Do you want to delete ${locations[row][0]}?`);
         if (retVal == true) {
             firebase.database().ref("locations").child(locations[row][6]).remove();
+            for (var x = 0; x < scavenger.length; x++) {
+                console.log(scavenger[x])
+                console.log(scavenger[x][1])
+                console.log(locations[row][6])
+                if (scavenger[x][1] == locations[row][6]) {
+                    firebase.database().ref("Scavenger").child(scavenger[x][0]).remove();
+                    scavenger.splice(x, 1);
+                }
+            }
+
             locations.splice(row, 1);
+            scavengerPopulate();
             LocationsPopulate();
+            console.log(locations);
+            console.log(scavenger);
         } else {
             LocationPopulate();
         }
