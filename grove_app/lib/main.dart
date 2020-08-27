@@ -161,7 +161,8 @@ class _HomePageState extends State<HomePage> {
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Read the basic information about the Medal of Honor Grove.\n',
+                          text:
+                              'Read the basic information about the Medal of Honor Grove.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -215,7 +216,8 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.only(
                   top: 30.0, bottom: 30.0, left: 15.0, right: 15.0),
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight:  MediaQuery.of(context).size.height / 2.0 - 100),
+                constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height / 2.0 - 100),
                 child: SingleChildScrollView(
                   child: Container(
                     child: Text(
@@ -358,7 +360,8 @@ class _VideoPageState extends State<VideoPage> {
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Watch our video about the Medal of Honor Grove.\n',
+                          text:
+                              'Watch our video about the Medal of Honor Grove.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -485,63 +488,72 @@ class _MapPageState extends State<MapPage> {
       return d;
     }
 
-    firebaseData.keys.forEach((var key) {
-      print(firebaseData[key]["latitude"]);
-      print(firebaseData[key]["longitude"]);
-      print(getDistanceFromLatLonInKm(
-          locationData.latitude,
-          locationData.longitude,
-          firebaseData[key]["latitude"],
-          firebaseData[key]["longitude"]));
-      if (getDistanceFromLatLonInKm(
-              locationData.latitude,
-              locationData.longitude,
+    if(firebaseData != null) {
+      firebaseData.keys.forEach((var key) {
+        print(firebaseData[key]["latitude"]);
+        print(firebaseData[key]["longitude"]);
+        print(getDistanceFromLatLonInKm(
+            locationData.latitude,
+            locationData.longitude,
+            firebaseData[key]["latitude"],
+            firebaseData[key]["longitude"]));
+        if (getDistanceFromLatLonInKm(
+            locationData.latitude,
+            locationData.longitude,
+            firebaseData[key]["latitude"],
+            firebaseData[key]["longitude"]) <
+            1000) {
+          var body =
+              "You are about ${1000 * getDistanceFromLatLonInKm(
+              locationData.latitude, locationData.longitude,
               firebaseData[key]["latitude"],
-              firebaseData[key]["longitude"]) <
-          1000) {
-        var body =
-            "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
-        if (!popupShown &&
-            (timePressed == null || new DateTime.now().isAfter(timePressed))) {
-          popupShown = true;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                    title: Text("Location Near"),
-                    content: Text(body),
-                    actions: <Widget>[
-                      MaterialButton(
-                        elevation: 5.0,
-                        onPressed: () {
-                          popupShown = false;
-                          timePressed =
-                              new DateTime.now().add(new Duration(minutes: 1));
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                              context,
-                              new MaterialPageRoute(
-                                  builder: (context) => new DetailsPage(
-                                      title: firebaseData[key]["name"],
-                                      info: firebaseData[key]["text"])));
-                        },
-                        child: Text("OK"),
-                      ),
-                      MaterialButton(
-                        elevation: 5.0,
-                        onPressed: () {
-                          popupShown = false;
-                          timePressed =
-                              new DateTime.now().add(new Duration(minutes: 1));
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("Cancel"),
-                      )
-                    ]);
-              });
+              firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
+          if (!popupShown &&
+              (timePressed == null ||
+                  new DateTime.now().isAfter(timePressed))) {
+            popupShown = true;
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                      title: Text("Location Near"),
+                      content: Text(body),
+                      actions: <Widget>[
+                        MaterialButton(
+                          elevation: 5.0,
+                          onPressed: () {
+                            popupShown = false;
+                            timePressed =
+                                new DateTime.now().add(new Duration(
+                                    minutes: 1));
+                            Navigator.of(context).pop();
+                            Navigator.push(
+                                context,
+                                new MaterialPageRoute(
+                                    builder: (context) =>
+                                    new DetailsPage(
+                                        title: firebaseData[key]["name"],
+                                        info: firebaseData[key]["text"])));
+                          },
+                          child: Text("OK"),
+                        ),
+                        MaterialButton(
+                          elevation: 5.0,
+                          onPressed: () {
+                            popupShown = false;
+                            timePressed =
+                                new DateTime.now().add(new Duration(
+                                    minutes: 1));
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Cancel"),
+                        )
+                      ]);
+                });
+          }
         }
-      }
-    });
+      });
+    }
 
     setState(() {
       latitude = locationData.latitude;
@@ -650,17 +662,19 @@ class _MapPageState extends State<MapPage> {
       );
       _markers["currentLocation"] = marker;
 
-      firebaseData.keys.forEach((var key) {
-        var newMarker = Marker(
-          markerId: MarkerId(key),
-          position: LatLng(
-              firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
-          infoWindow: InfoWindow(
-            title: firebaseData[key]["name"],
-          ),
-        );
-        _markers[key] = newMarker;
-      });
+      if(firebaseData != null) {
+        firebaseData.keys.forEach((var key) {
+          var newMarker = Marker(
+            markerId: MarkerId(key),
+            position: LatLng(
+                firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
+            infoWindow: InfoWindow(
+              title: firebaseData[key]["name"],
+            ),
+          );
+          _markers[key] = newMarker;
+        });
+      }
     });
 
     location.onLocationChanged.timeout(Duration(seconds: 5));
@@ -796,7 +810,8 @@ class _MapPageState extends State<MapPage> {
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'View a map with all labeled locations. Scan a QR code on a location to view the information. If you are close to the location, you will be alerted.\n',
+                          text:
+                              'View a map with all labeled locations. Scan a QR code on a location to view the information. If you are close to the location, you will be alerted.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -920,8 +935,10 @@ class _TreasurePageState extends State<TreasurePage> {
 
   initStateFunction() async {
     setState(() {
-      locationKey = scavengerData[prefs.getInt('treasureNum')];
-      locationData = firebaseData[locationKey];
+      if (scavengerData != null) {
+        locationKey = scavengerData[prefs.getInt('treasureNum')];
+        locationData = firebaseData[locationKey];
+      }
     });
   }
 
@@ -953,7 +970,8 @@ class _TreasurePageState extends State<TreasurePage> {
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Take part in a scavenger hunt to search for locations. When you find a location, scan the QR code and you will be given a new clue.\n',
+                          text:
+                              'Take part in a scavenger hunt to search for locations. When you find a location, scan the QR code and you will be given a new clue.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
@@ -996,7 +1014,8 @@ class _TreasurePageState extends State<TreasurePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: (scavengerData != null && scavengerData.length > prefs.getInt("treasureNum"))
+          children: (scavengerData != null &&
+                  scavengerData.length > prefs.getInt("treasureNum"))
               ? <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(15.0),
@@ -1088,12 +1107,14 @@ class _TreasurePageState extends State<TreasurePage> {
                         icon: Icon(Icons.refresh),
                         label: Text("Restart"),
                         onPressed: () async {
-                          setState(() {
-                            prefs.setInt('treasureNum', 1);
-                            locationKey =
-                                scavengerData[prefs.getInt('treasureNum')];
-                            locationData = firebaseData[locationKey];
-                          });
+                          if(scavengerData != null) {
+                            setState(() {
+                              prefs.setInt('treasureNum', 1);
+                              locationKey =
+                              scavengerData[prefs.getInt('treasureNum')];
+                              locationData = firebaseData[locationKey];
+                            });
+                          }
                         }),
                   ),
                 ],
@@ -1308,7 +1329,8 @@ class _SocialPageState extends State<SocialPage> {
                               decoration: TextDecoration.underline),
                         ),
                         TextSpan(
-                          text: 'Share a location through your social media platforms.\n',
+                          text:
+                              'Share a location through your social media platforms.\n',
                           style: TextStyle(fontSize: 20),
                         ),
                       ],
