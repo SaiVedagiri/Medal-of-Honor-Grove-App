@@ -65,7 +65,8 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
 
-  final ChromeSafariBrowser browser = new MyChromeSafariBrowser(new MyInAppBrowser());
+  final ChromeSafariBrowser browser =
+      new MyChromeSafariBrowser(new MyInAppBrowser());
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -243,25 +244,24 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(
-                        right: 20.0),
-                    child: Icon(Icons.web),),
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: Icon(Icons.web),
+                  ),
                   Text("Visit Website")
                 ],
               ),
               onPressed: () async {
                 await widget.browser.open(
-                    url:
-                    "https://friendsmohgrove.org/",
+                    url: "https://friendsmohgrove.org/",
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(
                             addDefaultShareMenuItem: true,
                             keepAliveEnabled: true),
                         ios: IOSSafariOptions(
                             dismissButtonStyle:
-                            IOSSafariDismissButtonStyle.CLOSE,
-                            presentationStyle: IOSUIModalPresentationStyle
-                                .OVER_FULL_SCREEN)));
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
               },
             )
           ],
@@ -522,13 +522,13 @@ class _MapPageState extends State<MapPage> {
       return d;
     }
 
-    if(firebaseData != null) {
+    if (firebaseData != null) {
       firebaseData.keys.forEach((var key) {
         if (getDistanceFromLatLonInKm(
-            locationData.latitude,
-            locationData.longitude,
-            firebaseData[key]["latitude"],
-            firebaseData[key]["longitude"]) <
+                locationData.latitude,
+                locationData.longitude,
+                firebaseData[key]["latitude"],
+                firebaseData[key]["longitude"]) <
             distanceLength) {
           var body =
               "You are nearby ${firebaseData[key]["name"]}. Would you like to more info?";
@@ -547,15 +547,13 @@ class _MapPageState extends State<MapPage> {
                           elevation: 5.0,
                           onPressed: () {
                             popupShown = false;
-                            timePressed =
-                                new DateTime.now().add(new Duration(
-                                    minutes: 1));
+                            timePressed = new DateTime.now()
+                                .add(new Duration(minutes: 1));
                             Navigator.of(context).pop();
                             Navigator.push(
                                 context,
                                 new MaterialPageRoute(
-                                    builder: (context) =>
-                                    new DetailsPage(
+                                    builder: (context) => new DetailsPage(
                                         title: firebaseData[key]["name"],
                                         info: firebaseData[key]["text"])));
                           },
@@ -565,9 +563,8 @@ class _MapPageState extends State<MapPage> {
                           elevation: 5.0,
                           onPressed: () {
                             popupShown = false;
-                            timePressed =
-                                new DateTime.now().add(new Duration(
-                                    minutes: 1));
+                            timePressed = new DateTime.now()
+                                .add(new Duration(minutes: 1));
                             Navigator.of(context).pop();
                           },
                           child: Text("Cancel"),
@@ -658,15 +655,16 @@ class _MapPageState extends State<MapPage> {
               position: LatLng(firebaseData[key]["latitude"],
                   firebaseData[key]["longitude"]),
               infoWindow: InfoWindow(
-                title: firebaseData[key]["name"],
-                snippet: "Click to see more info",
-                onTap: (){Navigator.push(
-                    context,
-                    new MaterialPageRoute(
-                        builder: (context) => new DetailsPage(
-                            title: firebaseData[key]["name"],
-                            info: firebaseData[key]["text"])));}
-              ),
+                  title: firebaseData[key]["name"],
+                  snippet: "Click to see more info",
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new DetailsPage(
+                                title: firebaseData[key]["name"],
+                                info: firebaseData[key]["text"])));
+                  }),
             );
             _markers[key] = newMarker;
           });
@@ -686,7 +684,7 @@ class _MapPageState extends State<MapPage> {
       );
       _markers["currentLocation"] = marker;
 
-      if(firebaseData != null) {
+      if (firebaseData != null) {
         firebaseData.keys.forEach((var key) {
           var newMarker = Marker(
             markerId: MarkerId(key),
@@ -1131,11 +1129,11 @@ class _TreasurePageState extends State<TreasurePage> {
                         icon: Icon(Icons.refresh),
                         label: Text("Restart"),
                         onPressed: () async {
-                          if(scavengerData != null) {
+                          if (scavengerData != null) {
                             setState(() {
                               prefs.setInt('treasureNum', 1);
                               locationKey =
-                              scavengerData[prefs.getInt('treasureNum')];
+                                  scavengerData[prefs.getInt('treasureNum')];
                               locationData = firebaseData[locationKey];
                             });
                           }
@@ -1207,78 +1205,95 @@ class _DetailsPageState extends State<DetailsPage> {
       DeviceOrientation.portraitDown,
     ]);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.help),
-            onPressed: () {
-              helpContext(
-                  context,
-                  "Help",
-                  Text.rich(
-                    TextSpan(
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: 'Details Page\n',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
+    return WillPopScope(
+      onWillPop: () async {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+        if (status == "Pause") {
+          await flutterTts.stop();
+          setState(() {
+            status = "Play";
+          });
+        }
+        Navigator.of(context).pop();
+        return;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.help),
+              onPressed: () {
+                helpContext(
+                    context,
+                    "Help",
+                    Text.rich(
+                      TextSpan(
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'Details Page\n',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline),
+                          ),
+                          TextSpan(
+                            text: 'View the details of a location.\n',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ));
+              },
+            ),
+          ],
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height - 350),
+                  child: SingleChildScrollView(
+                    child: Container(
+                      child: Text(
+                        '${widget.info}',
+                        style: TextStyle(
+                          fontSize: 20.0,
                         ),
-                        TextSpan(
-                          text: 'View the details of a location.\n',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ],
-                    ),
-                  ));
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height - 350),
-                child: SingleChildScrollView(
-                  child: Container(
-                    child: Text(
-                      '${widget.info}',
-                      style: TextStyle(
-                        fontSize: 20.0,
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: FloatingActionButton.extended(
-                  icon: Icon(status == "Play" ? Icons.play_arrow : Icons.pause),
-                  label: Text(status),
-                  onPressed: () async {
-                    if (status == "Play") {
-                      await flutterTts.speak(widget.info);
-                      setState(() {
-                        status = "Pause";
-                      });
-                    } else {
-                      await flutterTts.stop();
-                      setState(() {
-                        status = "Play";
-                      });
-                    }
-                  }),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: FloatingActionButton.extended(
+                    icon:
+                        Icon(status == "Play" ? Icons.play_arrow : Icons.pause),
+                    label: Text(status),
+                    onPressed: () async {
+                      if (status == "Play") {
+                        await flutterTts.speak(widget.info);
+                        setState(() {
+                          status = "Pause";
+                        });
+                      } else {
+                        await flutterTts.stop();
+                        setState(() {
+                          status = "Play";
+                        });
+                      }
+                    }),
+              ),
+            ],
+          ),
         ),
       ),
     );
