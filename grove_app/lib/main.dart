@@ -93,7 +93,6 @@ class _HomePageState extends State<HomePage> {
     ref.child("distance").once().then((DataSnapshot data) {
       distanceLength = data.value;
     });
-    print(distanceLength);
     prefs = await SharedPreferences.getInstance();
     if (prefs.getInt('treasureNum') == null) {
       prefs.setInt('treasureNum', 1);
@@ -525,13 +524,6 @@ class _MapPageState extends State<MapPage> {
 
     if(firebaseData != null) {
       firebaseData.keys.forEach((var key) {
-        print(firebaseData[key]["latitude"]);
-        print(firebaseData[key]["longitude"]);
-        print(getDistanceFromLatLonInKm(
-            locationData.latitude,
-            locationData.longitude,
-            firebaseData[key]["latitude"],
-            firebaseData[key]["longitude"]));
         if (getDistanceFromLatLonInKm(
             locationData.latitude,
             locationData.longitude,
@@ -597,13 +589,6 @@ class _MapPageState extends State<MapPage> {
         LocationData tempLocationData = await location.getLocation();
 
         firebaseData.keys.forEach((var key) {
-          print(firebaseData[key]["latitude"]);
-          print(firebaseData[key]["longitude"]);
-          print(getDistanceFromLatLonInKm(
-              locationData.latitude,
-              locationData.longitude,
-              firebaseData[key]["latitude"],
-              firebaseData[key]["longitude"]));
           if (getDistanceFromLatLonInKm(
                   locationData.latitude,
                   locationData.longitude,
