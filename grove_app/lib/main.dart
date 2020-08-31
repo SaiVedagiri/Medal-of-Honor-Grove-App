@@ -15,6 +15,7 @@ import 'package:camera/camera.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 var _firebaseRef = FirebaseDatabase().reference();
 FlutterTts flutterTts = FlutterTts();
@@ -27,6 +28,7 @@ var firebaseData;
 var scavengerData;
 var firstCamera;
 var videoId;
+var distanceLength;
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -63,6 +65,8 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
 
+  final ChromeSafariBrowser browser = new MyChromeSafariBrowser(new MyInAppBrowser());
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -86,6 +90,10 @@ class _HomePageState extends State<HomePage> {
     ref.child("videoId").once().then((DataSnapshot data) {
       videoId = data.value;
     });
+    ref.child("distance").once().then((DataSnapshot data) {
+      distanceLength = data.value;
+    });
+    print(distanceLength);
     prefs = await SharedPreferences.getInstance();
     if (prefs.getInt('treasureNum') == null) {
       prefs.setInt('treasureNum', 1);
@@ -214,10 +222,10 @@ class _HomePageState extends State<HomePage> {
                 )),
             Padding(
               padding: const EdgeInsets.only(
-                  top: 30.0, bottom: 30.0, left: 15.0, right: 15.0),
+                  top: 30.0, bottom: 20.0, left: 15.0, right: 15.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height / 2.0 - 100),
+                    maxHeight: MediaQuery.of(context).size.height / 2.0 - 150),
                 child: SingleChildScrollView(
                   child: Container(
                     child: Text(
@@ -230,6 +238,33 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            RaisedButton(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0),
+                    child: Icon(Icons.web),),
+                  Text("Visit Website")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url:
+                    "https://friendsmohgrove.org/",
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                            IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle: IOSUIModalPresentationStyle
+                                .OVER_FULL_SCREEN)));
+              },
+            )
           ],
         ),
       ),
@@ -437,8 +472,8 @@ class _MapPageState extends State<MapPage> {
   PermissionStatus permissionGranted;
   LocationData locationData;
   GoogleMapController mapController;
-  double latitude = 40.436689;
-  double longitude = -74.230622;
+  double latitude = 40.1048872;
+  double longitude = -75.4746419;
   final Map<String, Marker> _markers = {};
   BitmapDescriptor pinLocation;
 
@@ -502,12 +537,9 @@ class _MapPageState extends State<MapPage> {
             locationData.longitude,
             firebaseData[key]["latitude"],
             firebaseData[key]["longitude"]) <
-            1000) {
+            distanceLength) {
           var body =
-              "You are about ${1000 * getDistanceFromLatLonInKm(
-              locationData.latitude, locationData.longitude,
-              firebaseData[key]["latitude"],
-              firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
+              "You are nearby ${firebaseData[key]["name"]}. Would you like to more info?";
           if (!popupShown &&
               (timePressed == null ||
                   new DateTime.now().isAfter(timePressed))) {
@@ -577,9 +609,9 @@ class _MapPageState extends State<MapPage> {
                   locationData.longitude,
                   firebaseData[key]["latitude"],
                   firebaseData[key]["longitude"]) <
-              1000) {
+              distanceLength) {
             var body =
-                "You are about ${1000 * getDistanceFromLatLonInKm(locationData.latitude, locationData.longitude, firebaseData[key]["latitude"], firebaseData[key]["longitude"])}m to ${firebaseData[key]["name"]}. Would you like to more info?";
+                "You are nearby ${firebaseData[key]["name"]}. Would you like to more info?";
             if (!popupShown &&
                 (timePressed == null ||
                     new DateTime.now().isAfter(timePressed))) {
@@ -642,6 +674,13 @@ class _MapPageState extends State<MapPage> {
                   firebaseData[key]["longitude"]),
               infoWindow: InfoWindow(
                 title: firebaseData[key]["name"],
+                snippet: "Click to see more info",
+                onTap: (){Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) => new DetailsPage(
+                            title: firebaseData[key]["name"],
+                            info: firebaseData[key]["text"])));}
               ),
             );
             _markers[key] = newMarker;
@@ -1565,5 +1604,46 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             ]),
       ),
     );
+  }
+}
+
+class MyInAppBrowser extends InAppBrowser {
+  @override
+  Future onLoadStart(String url) async {
+    print("\n\nStarted $url\n\n");
+  }
+
+  @override
+  Future onLoadStop(String url) async {
+    print("\n\nStopped $url\n\n");
+  }
+
+  @override
+  void onLoadError(String url, int code, String message) {
+    print("\n\nCan't load $url.. Error: $message\n\n");
+  }
+
+  @override
+  void onExit() {
+    print("\n\nBrowser closed!\n\n");
+  }
+}
+
+class MyChromeSafariBrowser extends ChromeSafariBrowser {
+  MyChromeSafariBrowser(browserFallback) : super(bFallback: browserFallback);
+
+  @override
+  void onOpened() {
+    print("ChromeSafari browser opened");
+  }
+
+  @override
+  void onLoaded() {
+    print("ChromeSafari browser loaded");
+  }
+
+  @override
+  void onClosed() {
+    print("ChromeSafari browser closed");
   }
 }
