@@ -295,12 +295,23 @@ async function editClick() {
                 }
             }
 
+
+            let allZeros = true;
+            for(let i = 0; i < addArray.length; i++){
+                if(addArray[i][1] != 0){
+                    allZeros = false;
+                    break;
+                }
+            }
             let order = false;
             if (minIndex != -1 && indexArray.length - minIndex == max) {
+                order = true;
+            } else if(allZeros){
                 order = true;
             }
 
             if (!duplicates) {
+                console.log(`order = ${order}`);
                 if (order) {
                     scavenger = [];
                     missing = [];
