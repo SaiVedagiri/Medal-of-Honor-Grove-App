@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
           "/video": (_) => VideoPage(),
           "/map": (_) => MapPage(),
           "/treasure": (_) => TreasurePage(),
+          "/links": (_) => LinksPage(),
         });
   }
 }
@@ -205,6 +206,12 @@ class _HomePageState extends State<HomePage> {
               icon: Icon(Icons.add_shopping_cart),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "/treasure");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/links");
               },
             ),
           ],
@@ -432,6 +439,12 @@ class _VideoPageState extends State<VideoPage> {
                 Navigator.pushReplacementNamed(context, "/treasure");
               },
             ),
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/links");
+              },
+            ),
           ],
         ),
       ),
@@ -555,7 +568,8 @@ class _MapPageState extends State<MapPage> {
                                 new MaterialPageRoute(
                                     builder: (context) => new DetailsPage(
                                         title: firebaseData[key]["name"],
-                                        info: firebaseData[key]["text"])));
+                                        info: firebaseData[key]["text"],
+                                    url: firebaseData[key]["url"])));
                           },
                           child: Text("OK"),
                         ),
@@ -617,7 +631,8 @@ class _MapPageState extends State<MapPage> {
                                   new MaterialPageRoute(
                                       builder: (context) => new DetailsPage(
                                           title: firebaseData[key]["name"],
-                                          info: firebaseData[key]["text"])));
+                                          info: firebaseData[key]["text"],
+                                          url: firebaseData[key]["url"])));
                             },
                             child: Text("OK"),
                           ),
@@ -663,7 +678,8 @@ class _MapPageState extends State<MapPage> {
                         new MaterialPageRoute(
                             builder: (context) => new DetailsPage(
                                 title: firebaseData[key]["name"],
-                                info: firebaseData[key]["text"])));
+                                info: firebaseData[key]["text"],
+                                url: firebaseData[key]["url"])));
                   }),
             );
             _markers[key] = newMarker;
@@ -776,11 +792,12 @@ class _MapPageState extends State<MapPage> {
                       done = true;
                       var locationName = firebaseData[key]["name"];
                       var locationDetails = firebaseData[key]["text"];
+                      var locationUrl = firebaseData[key]["url"];
                       Navigator.push(
                           context,
                           new MaterialPageRoute(
                               builder: (context) => new DetailsPage(
-                                  title: locationName, info: locationDetails)));
+                                  title: locationName, info: locationDetails, url: locationUrl)));
                     }
                   });
                   if (done == false) {
@@ -868,6 +885,12 @@ class _MapPageState extends State<MapPage> {
               icon: Icon(Icons.add_shopping_cart),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "/treasure");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/links");
               },
             ),
           ],
@@ -1030,6 +1053,12 @@ class _TreasurePageState extends State<TreasurePage> {
               icon: Icon(Icons.add_shopping_cart),
               onPressed: () {},
             ),
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/links");
+              },
+            ),
           ],
         ),
       ),
@@ -1147,10 +1176,14 @@ class _TreasurePageState extends State<TreasurePage> {
 }
 
 class DetailsPage extends StatefulWidget {
-  DetailsPage({Key key, this.title, this.info}) : super(key: key);
+  DetailsPage({Key key, this.title, this.info, this.url}) : super(key: key);
 
   final String title;
   final String info;
+  final String url;
+
+  final ChromeSafariBrowser browser =
+  new MyChromeSafariBrowser(new MyInAppBrowser());
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
@@ -1259,7 +1292,7 @@ class _DetailsPageState extends State<DetailsPage> {
                 padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height - 350),
+                      maxHeight: MediaQuery.of(context).size.height - 450),
                   child: SingleChildScrollView(
                     child: Container(
                       child: Text(
@@ -1273,7 +1306,7 @@ class _DetailsPageState extends State<DetailsPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 30.0),
+                padding: const EdgeInsets.only(top: 30.0, bottom: 30.0),
                 child: FloatingActionButton.extended(
                     icon:
                         Icon(status == "Play" ? Icons.play_arrow : Icons.pause),
@@ -1291,7 +1324,35 @@ class _DetailsPageState extends State<DetailsPage> {
                         });
                       }
                     }),
-              ),
+              ),Opacity(
+        opacity: widget.url == null ? 0.0 : 1.0,
+        child:
+        RaisedButton(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: Icon(Icons.web),
+                    ),
+                    Text("Learn More")
+                  ],
+                ),
+                onPressed: () async {
+                  await widget.browser.open(
+                      url: "${widget.url}",
+                      options: ChromeSafariBrowserClassOptions(
+                          android: AndroidChromeCustomTabsOptions(
+                              addDefaultShareMenuItem: true,
+                              keepAliveEnabled: true),
+                          ios: IOSSafariOptions(
+                              dismissButtonStyle:
+                              IOSSafariDismissButtonStyle.CLOSE,
+                              presentationStyle:
+                              IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+                },
+              ),),
             ],
           ),
         ),
@@ -1405,6 +1466,12 @@ class _SocialPageState extends State<SocialPage> {
             IconButton(
               icon: Icon(Icons.add_shopping_cart),
               onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/links");
+              },
             ),
           ],
         ),
@@ -1645,5 +1712,71 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override
   void onClosed() {
     print("ChromeSafari browser closed");
+  }
+}
+
+class LinksPage extends StatefulWidget {
+
+  const LinksPage(
+      {Key key})
+      : super(key: key);
+
+  @override
+  LinksPageState createState() => LinksPageState();
+}
+
+// A widget that displays the picture taken by the user.
+class LinksPageState extends State<LinksPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Social Media')),
+      bottomNavigationBar: BottomAppBar(
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.videocam),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/video");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.map),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/map");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.add_shopping_cart),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/treasure");
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+              },
+            ),
+          ],
+        ),
+      ),
+      // The image is stored as a file on the device. Use the `Image.file`
+      // constructor with the given path to display the image.
+      body: Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+
+            ]),
+      ),
+    );
   }
 }
