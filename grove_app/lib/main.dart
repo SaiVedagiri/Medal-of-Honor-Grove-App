@@ -16,6 +16,7 @@ import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 var _firebaseRef = FirebaseDatabase().reference();
 FlutterTts flutterTts = FlutterTts();
@@ -26,6 +27,7 @@ var prefs;
 
 var firebaseData;
 var scavengerData;
+var linksData;
 var firstCamera;
 var videoId;
 var distanceLength;
@@ -88,6 +90,9 @@ class _HomePageState extends State<HomePage> {
     });
     ref.child("Scavenger").once().then((DataSnapshot data) {
       scavengerData = data.value;
+    });
+    ref.child("links").once().then((DataSnapshot data) {
+      linksData = data.value;
     });
     ref.child("videoId").once().then((DataSnapshot data) {
       videoId = data.value;
@@ -203,7 +208,8 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.add_shopping_cart),
+              icon: FaIcon(FontAwesomeIcons.gem),
+              iconSize: 20,
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "/treasure");
               },
@@ -229,7 +235,10 @@ class _HomePageState extends State<HomePage> {
                 )),
             Padding(
               padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height / 33.0, bottom: 20.0, left: 15.0, right: 15.0),
+                  top: MediaQuery.of(context).size.height / 33.0,
+                  bottom: 20.0,
+                  left: 15.0,
+                  right: 15.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height / 2.0 - 150),
@@ -259,7 +268,7 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () async {
                 await widget.browser.open(
-                    url: "https://friendsmohgrove.org/",
+                    url: linksData["website"],
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(
                             addDefaultShareMenuItem: true,
@@ -434,7 +443,8 @@ class _VideoPageState extends State<VideoPage> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.add_shopping_cart),
+              icon: FaIcon(FontAwesomeIcons.gem),
+              iconSize: 20,
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "/treasure");
               },
@@ -569,7 +579,7 @@ class _MapPageState extends State<MapPage> {
                                     builder: (context) => new DetailsPage(
                                         title: firebaseData[key]["name"],
                                         info: firebaseData[key]["text"],
-                                    url: firebaseData[key]["url"])));
+                                        url: firebaseData[key]["url"])));
                           },
                           child: Text("OK"),
                         ),
@@ -707,8 +717,17 @@ class _MapPageState extends State<MapPage> {
             position: LatLng(
                 firebaseData[key]["latitude"], firebaseData[key]["longitude"]),
             infoWindow: InfoWindow(
-              title: firebaseData[key]["name"],
-            ),
+                title: firebaseData[key]["name"],
+                snippet: "Click to see more info",
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (context) => new DetailsPage(
+                              title: firebaseData[key]["name"],
+                              info: firebaseData[key]["text"],
+                              url: firebaseData[key]["url"])));
+                }),
           );
           _markers[key] = newMarker;
         });
@@ -797,7 +816,9 @@ class _MapPageState extends State<MapPage> {
                           context,
                           new MaterialPageRoute(
                               builder: (context) => new DetailsPage(
-                                  title: locationName, info: locationDetails, url: locationUrl)));
+                                  title: locationName,
+                                  info: locationDetails,
+                                  url: locationUrl)));
                     }
                   });
                   if (done == false) {
@@ -882,7 +903,8 @@ class _MapPageState extends State<MapPage> {
               onPressed: () {},
             ),
             IconButton(
-              icon: Icon(Icons.add_shopping_cart),
+              icon: FaIcon(FontAwesomeIcons.gem),
+              iconSize: 20,
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "/treasure");
               },
@@ -1050,7 +1072,8 @@ class _TreasurePageState extends State<TreasurePage> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.add_shopping_cart),
+              icon: FaIcon(FontAwesomeIcons.gem),
+              iconSize: 20,
               onPressed: () {},
             ),
             IconButton(
@@ -1183,7 +1206,7 @@ class DetailsPage extends StatefulWidget {
   final String url;
 
   final ChromeSafariBrowser browser =
-  new MyChromeSafariBrowser(new MyInAppBrowser());
+      new MyChromeSafariBrowser(new MyInAppBrowser());
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
@@ -1324,35 +1347,36 @@ class _DetailsPageState extends State<DetailsPage> {
                         });
                       }
                     }),
-              ),Opacity(
-        opacity: widget.url == null ? 0.0 : 1.0,
-        child:
-        RaisedButton(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: Icon(Icons.web),
-                    ),
-                    Text("Learn More")
-                  ],
+              ),
+              Opacity(
+                opacity: widget.url == null ? 0.0 : 1.0,
+                child: RaisedButton(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: Icon(Icons.web),
+                      ),
+                      Text("Learn More")
+                    ],
+                  ),
+                  onPressed: () async {
+                    await widget.browser.open(
+                        url: "${widget.url}",
+                        options: ChromeSafariBrowserClassOptions(
+                            android: AndroidChromeCustomTabsOptions(
+                                addDefaultShareMenuItem: true,
+                                keepAliveEnabled: true),
+                            ios: IOSSafariOptions(
+                                dismissButtonStyle:
+                                    IOSSafariDismissButtonStyle.CLOSE,
+                                presentationStyle: IOSUIModalPresentationStyle
+                                    .OVER_FULL_SCREEN)));
+                  },
                 ),
-                onPressed: () async {
-                  await widget.browser.open(
-                      url: "${widget.url}",
-                      options: ChromeSafariBrowserClassOptions(
-                          android: AndroidChromeCustomTabsOptions(
-                              addDefaultShareMenuItem: true,
-                              keepAliveEnabled: true),
-                          ios: IOSSafariOptions(
-                              dismissButtonStyle:
-                              IOSSafariDismissButtonStyle.CLOSE,
-                              presentationStyle:
-                              IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
-                },
-              ),),
+              ),
             ],
           ),
         ),
@@ -1464,7 +1488,8 @@ class _SocialPageState extends State<SocialPage> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.add_shopping_cart),
+              icon: FaIcon(FontAwesomeIcons.gem),
+              iconSize: 20,
               onPressed: () {},
             ),
             IconButton(
@@ -1716,10 +1741,10 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 }
 
 class LinksPage extends StatefulWidget {
+  LinksPage({Key key}) : super(key: key);
 
-  const LinksPage(
-      {Key key})
-      : super(key: key);
+  final ChromeSafariBrowser browser =
+      new MyChromeSafariBrowser(new MyInAppBrowser());
 
   @override
   LinksPageState createState() => LinksPageState();
@@ -1730,7 +1755,7 @@ class LinksPageState extends State<LinksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Social Media')),
+      appBar: AppBar(title: Text('Links')),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
           mainAxisSize: MainAxisSize.max,
@@ -1755,15 +1780,15 @@ class LinksPageState extends State<LinksPage> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.add_shopping_cart),
+              icon: FaIcon(FontAwesomeIcons.gem),
+              iconSize: 20,
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "/treasure");
               },
             ),
             IconButton(
               icon: Icon(Icons.share),
-              onPressed: () {
-              },
+              onPressed: () {},
             ),
           ],
         ),
@@ -1771,11 +1796,166 @@ class LinksPageState extends State<LinksPage> {
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-
-            ]),
+        child: SingleChildScrollView(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
+              Widget>[
+            FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: Icon(Icons.web),
+                  ),
+                  Text("Website")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url: linksData["website"],
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+              },
+            ),
+            Divider(color: Colors.black),
+            FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: FaIcon(FontAwesomeIcons.mobileAlt),
+                  ),
+                  Text("App Info")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url: linksData["appinfo"],
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+              },
+            ),
+            Divider(color: Colors.black),
+            FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: FaIcon(FontAwesomeIcons.flickr),
+                  ),
+                  Text("Flickr")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url: linksData["flickr"],
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+              },
+            ),
+            Divider(color: Colors.black),
+            FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: FaIcon(FontAwesomeIcons.instagram),
+                  ),
+                  Text("Instagram")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url: linksData["instagram"],
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+              },
+            ),
+            Divider(color: Colors.black),
+            FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: FaIcon(FontAwesomeIcons.facebook),
+                  ),
+                  Text("Facebook")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url: linksData["facebook"],
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+              },
+            ),
+            Divider(color: Colors.black),
+            FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: FaIcon(FontAwesomeIcons.youtube),
+                  ),
+                  Text("YouTube")
+                ],
+              ),
+              onPressed: () async {
+                await widget.browser.open(
+                    url: linksData["youtube"],
+                    options: ChromeSafariBrowserClassOptions(
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: true,
+                            keepAliveEnabled: true),
+                        ios: IOSSafariOptions(
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+              },
+            ),
+          ]),
+        ),
       ),
     );
   }
