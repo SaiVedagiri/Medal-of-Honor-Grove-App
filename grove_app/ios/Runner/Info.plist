@@ -25,11 +25,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>The Grove app needs to access your camera.</string>
+	<string>The MOH Grove app needs to access your camera for taking pictures and scanning QR codes.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The Grove app needs to access your current location.</string>
+	<string>The MOH Grove app needs to access your current location to display your location on the Grove and provide live location info updates as you move around the site.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The Grove app needs to access your microphone.</string>
+	<string>The MOH Grove app needs to access your microphone to record a photograph.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
