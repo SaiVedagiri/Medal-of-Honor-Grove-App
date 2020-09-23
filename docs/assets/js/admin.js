@@ -18,6 +18,7 @@ if (sessionStorage.getItem("valid") != "true") {
         temp.push(newPost.text);
         temp.push(newPost.social);
         temp.push(snapshot.key);
+        temp.push(newPost.link)
 
         firebase.database().ref("locations").startAt("link").endAt("link").once('value', function(snap){
             let returnVar = "none"
@@ -54,6 +55,7 @@ function newLocationAdd() {
         let social = document.getElementById("addSocial").value;
         let qr = Math.round(Math.random() * 10000000000).toString();
         let locationLink = document.getElementById("addLink").value;
+        console.log(locationLink);
 
         if (latitude != NaN && latitude > -90 && latitude < 90 && longitude != NaN && longitude > -180 && longitude < 180 && name != "") {
             firebase.database().ref("locations").push({
@@ -91,7 +93,7 @@ function LocationsPopulate() {
 function LocationEditPopulate(tableRow) {
     if (editScavenger) {
         editRow = true;
-        let rowstring = `<tr><td><input id="editName${tableRow}" type="text" style="width: 159px;" value="${locations[tableRow][0]}"></td><td class="text-center" id="editQR${locations[tableRow][1]}">${locations[tableRow][1]}</td><td><input id="editLatitude${tableRow}" type="text" style="width: 150px;" value="${locations[tableRow][2]}"></td><td><input id="editLongitude${tableRow}" type="text" style="width: 150px;" value="${locations[tableRow][3]}"></td><td class="text-center"><textarea id="editDetails${tableRow}" style="width:402px;">${locations[tableRow][4]}</textarea></td><td><input id="editSocial${tableRow}" type="text" value="${locations[tableRow][5]}"></td><td><input id="editSocial${tableRow}" type="text" value="${locations[tableRow][7]}"></td><td class="text-center"><button onclick="SaveEdit(${tableRow})" class="btn btn-primary" type="button" style="margin-bottom: 15px;">Save</button><button onclick="DeleteEdit(${tableRow})" class="btn btn-primary" type="button">Discard</button></td>`
+        let rowstring = `<tr><td><input id="editName${tableRow}" type="text" style="width: 159px;" value="${locations[tableRow][0]}"></td><td class="text-center" id="editQR${locations[tableRow][1]}">${locations[tableRow][1]}</td><td><input id="editLatitude${tableRow}" type="text" style="width: 150px;" value="${locations[tableRow][2]}"></td><td><input id="editLongitude${tableRow}" type="text" style="width: 150px;" value="${locations[tableRow][3]}"></td><td class="text-center"><textarea id="editDetails${tableRow}" style="width:402px;">${locations[tableRow][4]}</textarea></td><td><input id="editSocial${tableRow}" type="text" value="${locations[tableRow][5]}"></td><td><input id="editLink${tableRow}" type="text" value="${locations[tableRow][7]}"></td><td class="text-center"><button onclick="SaveEdit(${tableRow})" class="btn btn-primary" type="button" style="margin-bottom: 15px;">Save</button><button onclick="DeleteEdit(${tableRow})" class="btn btn-primary" type="button">Discard</button></td>`
         document.getElementById(`row${tableRow}`).innerHTML = rowstring;
     }
 }
@@ -104,7 +106,9 @@ function SaveEdit(row) {
     let social = document.getElementById(`editSocial${row}`).value;
     let qr = locations[row][1];
     let key = locations[row][6];
-    let locationLink = locations[row][7]
+    let locationLink = document.getElementById(`editLink${row}`).value;
+
+    console.log(locationLink);
 
     if (latitude != NaN && latitude > -90 && latitude < 90 && longitude != NaN && longitude > -180 && longitude < 180 && name != "") {
         let temp = []
