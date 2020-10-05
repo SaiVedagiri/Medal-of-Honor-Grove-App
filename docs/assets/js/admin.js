@@ -18,16 +18,11 @@ if (sessionStorage.getItem("valid") != "true") {
         temp.push(newPost.text);
         temp.push(newPost.social);
         temp.push(snapshot.key);
-        temp.push(newPost.link)
+        temp.push(newPost.link);
 
-        firebase.database().ref("locations").startAt("link").endAt("link").once('value', function(snap){
-            let returnVar = "none"
-            if(snap.exists()){
-                returnVar = snap.link;
-            return
-            }
-            temp.push(returnVar);
-        });
+        if (temp[temp.length-1] == undefined) {
+            temp[temp.length-1] = "none";
+        }
 
         locations.push(temp);
         LocationsPopulate();
@@ -46,7 +41,6 @@ if (sessionStorage.getItem("valid") != "true") {
 }
 
 function newLocationAdd() {
-    console.log("here");
     if (editScavenger) {
         let name = document.getElementById("addName").value;
         let latitude = parseFloat(document.getElementById("addLatitude").value);
@@ -55,18 +49,22 @@ function newLocationAdd() {
         let social = document.getElementById("addSocial").value;
         let qr = Math.round(Math.random() * 10000000000).toString();
         let locationLink = document.getElementById("addLink").value;
-        console.log(locationLink);
 
         if (latitude != NaN && latitude > -90 && latitude < 90 && longitude != NaN && longitude > -180 && longitude < 180 && name != "") {
-            firebase.database().ref("locations").push({
-                latitude: latitude,
-                longitude: longitude,
-                name: name,
-                "qr-id": qr,
-                social: social,
-                text: details,
-                link: locationLink
-            });
+            if (validURL(locationLink)) {
+                firebase.database().ref("locations").push({
+                    latitude: latitude,
+                    longitude: longitude,
+                    name: name,
+                    "qr-id": qr,
+                    social: social,
+                    text: details,
+                    link: locationLink
+                });
+            } else {
+                alert("Invalid link entered. Please check that you typed the link in correctly.");
+            }
+            
         } else {
             alert("There is invalid or empty information. Please enter valid data to add location.");
         }
@@ -98,7 +96,7 @@ function LocationEditPopulate(tableRow) {
     }
 }
 
-function SaveEdit(row) {
+async function SaveEdit(row) {
     let name = document.getElementById(`editName${row}`).value;
     let latitude = parseFloat(document.getElementById(`editLatitude${row}`).value);
     let longitude = parseFloat(document.getElementById(`editLongitude${row}`).value);
@@ -108,15 +106,14 @@ function SaveEdit(row) {
     let key = locations[row][6];
     let locationLink = document.getElementById(`editLink${row}`).value;
 
-    console.log(locationLink);
 
     if (latitude != NaN && latitude > -90 && latitude < 90 && longitude != NaN && longitude > -180 && longitude < 180 && name != "") {
-        let temp = []
-        temp.push(name, qr, latitude, longitude, details, social, key);
-        locations[row] = temp;
 
         if (locationLink == "") {
-            firebase.database().ref("locations").child(key).update({
+            let temp = []
+            temp.push(name, qr, latitude, longitude, details, social, key, "none");
+            locations[row] = temp;
+            await firebase.database().ref("locations").child(key).update({
                 name: name,
                 latitude: latitude,
                 longitude: longitude,
@@ -124,14 +121,21 @@ function SaveEdit(row) {
                 social: social,
             });
         } else {
-            firebase.database().ref("locations").child(key).update({
-                name: name,
-                latitude: latitude,
-                longitude: longitude,
-                text: details,
-                social: social,
-                link: locationLink
-            });
+            if (validURL(locationLink)) {
+                let temp = []
+                temp.push(name, qr, latitude, longitude, details, social, key, locationLink);
+                locations[row] = temp;
+                await firebase.database().ref("locations").child(key).update({
+                    name: name,
+                    latitude: latitude,
+                    longitude: longitude,
+                    text: details,
+                    social: social,
+                    link: locationLink
+                });
+            } else {
+                alert("Invalid link entered. Please check that you typed the link in correctly.");
+            }
         }
         
         editRow = false;
@@ -153,9 +157,6 @@ function LocationDeletePopulate(row) {
         if (retVal == true) {
             firebase.database().ref("locations").child(locations[row][6]).remove();
             for (var x = 0; x < scavenger.length; x++) {
-                console.log(scavenger[x])
-                console.log(scavenger[x][1])
-                console.log(locations[row][6])
                 if (scavenger[x][1] == locations[row][6]) {
                     firebase.database().ref("Scavenger").child(scavenger[x][0]).remove();
                     scavenger.splice(x, 1);
@@ -165,8 +166,6 @@ function LocationDeletePopulate(row) {
             locations.splice(row, 1);
             scavengerPopulate();
             LocationsPopulate();
-            console.log(locations);
-            console.log(scavenger);
         } else {
             LocationPopulate();
         }
@@ -339,7 +338,6 @@ async function editClick() {
             }
 
             if (!duplicates) {
-                console.log(`order = ${order}`);
                 if (order) {
                     scavenger = [];
                     missing = [];
@@ -363,3 +361,13 @@ async function editClick() {
         }
     }
 }
+
+function validURL(str) {
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+      '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
+  }
