@@ -18,9 +18,9 @@ if (sessionStorage.getItem("valid") != "true") {
         temp.push(newPost.text);
         temp.push(newPost.social);
         temp.push(snapshot.key);
-        temp.push(newPost.link);
+        temp.push(newPost.url);
 
-        if (temp[temp.length-1] == undefined) {
+        if (temp[temp.length-1] == undefined || temp[temp.length-1] == "undefined" || temp[temp.length-1] == "none") {
             temp[temp.length-1] = "none";
         }
 
@@ -59,7 +59,16 @@ function newLocationAdd() {
                     "qr-id": qr,
                     social: social,
                     text: details,
-                    link: locationLink
+                    url: locationLink
+                });
+            } else if (locationLink == "") {
+                irebase.database().ref("locations").push({
+                    latitude: latitude,
+                    longitude: longitude,
+                    name: name,
+                    "qr-id": qr,
+                    social: social,
+                    text: details
                 });
             } else {
                 alert("Invalid link entered. Please check that you typed the link in correctly.");
@@ -111,7 +120,7 @@ async function SaveEdit(row) {
 
         if (locationLink == "") {
             let temp = []
-            temp.push(name, qr, latitude, longitude, details, social, key, "none");
+            temp.push(name, qr, latitude, longitude, details, social, key);
             locations[row] = temp;
             await firebase.database().ref("locations").child(key).update({
                 name: name,
@@ -131,7 +140,7 @@ async function SaveEdit(row) {
                     longitude: longitude,
                     text: details,
                     social: social,
-                    link: locationLink
+                    url: locationLink
                 });
             } else {
                 alert("Invalid link entered. Please check that you typed the link in correctly.");
