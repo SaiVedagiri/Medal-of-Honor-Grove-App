@@ -62,7 +62,7 @@ function newLocationAdd() {
                     url: locationLink
                 });
             } else if (locationLink == "") {
-                irebase.database().ref("locations").push({
+                firebase.database().ref("locations").push({
                     latitude: latitude,
                     longitude: longitude,
                     name: name,
@@ -122,7 +122,7 @@ async function SaveEdit(row) {
             let temp = []
             temp.push(name, qr, latitude, longitude, details, social, key);
             locations[row] = temp;
-            await firebase.database().ref("locations").child(key).update({
+            await firebase.database().ref("locations").child(key).set({
                 name: name,
                 latitude: latitude,
                 longitude: longitude,
@@ -134,7 +134,7 @@ async function SaveEdit(row) {
                 let temp = []
                 temp.push(name, qr, latitude, longitude, details, social, key, locationLink);
                 locations[row] = temp;
-                await firebase.database().ref("locations").child(key).update({
+                await firebase.database().ref("locations").child(key).set({
                     name: name,
                     latitude: latitude,
                     longitude: longitude,
