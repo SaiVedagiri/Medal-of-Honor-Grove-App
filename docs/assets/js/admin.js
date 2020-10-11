@@ -188,7 +188,7 @@ function scavengerPopulate() {
 
     for (var x = 0; x < scavenger.length; x++) {
         for (var y = 0; y < x; y++) {
-            if (scavenger[y][0] > scavenger[x][0]) {
+            if (parseInt(scavenger[y][0]) > parseInt(scavenger[x][0])) {
                 temp = scavenger[y];
                 scavenger[y] = scavenger[x];
                 scavenger[x] = temp;
@@ -207,7 +207,6 @@ function scavengerPopulate() {
 
     let missing = [];
     if (scavenger.length != locations.length) {
-
         for (x = 0; x < locations.length; x++) {
             let found = false;
             for (var y = 0; y < scavenger.length; y++) {
@@ -240,7 +239,7 @@ function ScavengerEditPopulate() {
 
     for (var x = 0; x < scavenger.length; x++) {
         for (var y = 0; y < x; y++) {
-            if (scavenger[y][0] > scavenger[x][0]) {
+            if (parseInt(scavenger[y][0]) > parseInt(scavenger[x][0])) {
                 temp = scavenger[y];
                 scavenger[y] = scavenger[x];
                 scavenger[x] = temp;
@@ -310,7 +309,7 @@ async function editClick() {
 
             indexArray = [];
             for (var x = 0; x < addArray.length; x++) {
-                indexArray.push(addArray[x][1]);
+                indexArray.push(parseInt(addArray[x][1]));
             }
 
             duplicates = false;
@@ -322,7 +321,12 @@ async function editClick() {
                 }
             }
 
-            indexArray.sort();
+            indexArray.sort( function( a , b){
+                if(a > b) return 1;
+                if(a < b) return -1;
+                return 0;
+            });
+
             max = indexArray[indexArray.length - 1];
             minIndex = -1;
             for (var x = 0; x < indexArray.length; x++) {
