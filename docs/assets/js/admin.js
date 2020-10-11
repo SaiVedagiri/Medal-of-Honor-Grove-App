@@ -40,7 +40,7 @@ if (sessionStorage.getItem("valid") != "true") {
     });
 }
 
-function newLocationAdd() {
+async function newLocationAdd() {
     if (editScavenger) {
         let name = document.getElementById("addName").value;
         let latitude = parseFloat(document.getElementById("addLatitude").value);
@@ -49,6 +49,19 @@ function newLocationAdd() {
         let social = document.getElementById("addSocial").value;
         let qr = Math.round(Math.random() * 10000000000).toString();
         let locationLink = document.getElementById("addLink").value;
+
+        while (true) {
+            let myVal = await firebase.database()
+              .ref("locations")
+              .orderByChild("qr-id")
+              .equalTo(qr)
+              .once("value");
+            myVal = myVal.val();
+            if(!myVal){
+                break;
+            }
+            qr = Math.round(Math.random() * 10000000000).toString();
+        }
 
         if (latitude != NaN && latitude > -90 && latitude < 90 && longitude != NaN && longitude > -180 && longitude < 180 && name != "") {
             if (validURL(locationLink)) {
