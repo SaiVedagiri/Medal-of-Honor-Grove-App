@@ -664,15 +664,6 @@ class _MapPageState extends State<MapPage> {
 
         setState(() {
           _markers.clear();
-          var marker = Marker(
-            markerId: MarkerId("currentLocation"),
-            icon: pinLocation,
-            position: LatLng(latitude, longitude),
-            infoWindow: InfoWindow(
-              title: "Current Location",
-            ),
-          );
-          _markers["currentLocation"] = marker;
 
           firebaseData.keys.forEach((var key) {
             var newMarker = Marker(
@@ -694,21 +685,21 @@ class _MapPageState extends State<MapPage> {
             );
             _markers[key] = newMarker;
           });
+          var marker = Marker(
+            markerId: MarkerId("currentLocation"),
+            icon: pinLocation,
+            position: LatLng(latitude, longitude),
+            infoWindow: InfoWindow(
+              title: "Current Location",
+            ),
+          );
+          _markers["currentLocation"] = marker;
         });
       } catch (ex) {}
     });
 
     setState(() {
       _markers.clear();
-      var marker = Marker(
-        markerId: MarkerId("currentLocation"),
-        position: LatLng(latitude, longitude),
-        icon: pinLocation,
-        infoWindow: InfoWindow(
-          title: "Current Location",
-        ),
-      );
-      _markers["currentLocation"] = marker;
 
       if (firebaseData != null) {
         firebaseData.keys.forEach((var key) {
@@ -732,6 +723,16 @@ class _MapPageState extends State<MapPage> {
           _markers[key] = newMarker;
         });
       }
+
+      var marker = Marker(
+        markerId: MarkerId("currentLocation"),
+        position: LatLng(latitude, longitude),
+        icon: pinLocation,
+        infoWindow: InfoWindow(
+          title: "Current Location",
+        ),
+      );
+      _markers["currentLocation"] = marker;
     });
 
     location.onLocationChanged.timeout(Duration(seconds: 5));
