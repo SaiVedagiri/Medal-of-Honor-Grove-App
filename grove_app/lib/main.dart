@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
           "/": (_) => HomePage(),
           "/video": (_) => VideoPage(),
           "/map": (_) => MapPage(),
-          "/treasure": (_) => TreasurePage(),
+          // "/treasure": (_) => TreasurePage(),
           "/links": (_) => LinksPage(),
         });
   }
@@ -207,13 +207,13 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pushReplacementNamed(context, "/map");
               },
             ),
-            IconButton(
-              icon: FaIcon(FontAwesomeIcons.gem),
-              iconSize: 20,
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/treasure");
-              },
-            ),
+            // IconButton(
+            //   icon: FaIcon(FontAwesomeIcons.gem),
+            //   iconSize: 20,
+            //   onPressed: () {
+            //     Navigator.pushReplacementNamed(context, "/treasure");
+            //   },
+            // ),
             IconButton(
               icon: Icon(Icons.share),
               onPressed: () {
@@ -442,13 +442,13 @@ class _VideoPageState extends State<VideoPage> {
                 Navigator.pushReplacementNamed(context, "/map");
               },
             ),
-            IconButton(
-              icon: FaIcon(FontAwesomeIcons.gem),
-              iconSize: 20,
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/treasure");
-              },
-            ),
+            // IconButton(
+            //   icon: FaIcon(FontAwesomeIcons.gem),
+            //   iconSize: 20,
+            //   onPressed: () {
+            //     Navigator.pushReplacementNamed(context, "/treasure");
+            //   },
+            // ),
             IconButton(
               icon: Icon(Icons.share),
               onPressed: () {
@@ -903,13 +903,13 @@ class _MapPageState extends State<MapPage> {
               icon: Icon(Icons.map),
               onPressed: () {},
             ),
-            IconButton(
-              icon: FaIcon(FontAwesomeIcons.gem),
-              iconSize: 20,
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/treasure");
-              },
-            ),
+            // IconButton(
+            //   icon: FaIcon(FontAwesomeIcons.gem),
+            //   iconSize: 20,
+            //   onPressed: () {
+            //     Navigator.pushReplacementNamed(context, "/treasure");
+            //   },
+            // ),
             IconButton(
               icon: Icon(Icons.share),
               onPressed: () {
