@@ -1,6 +1,6 @@
-# groveapp
+# grove_app
 
-Medal of Honor Grove App
+Medal of Honor Grove
 
 ## Getting Started
 

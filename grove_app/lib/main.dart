@@ -1780,13 +1780,13 @@ class LinksPageState extends State<LinksPage> {
                 Navigator.pushReplacementNamed(context, "/map");
               },
             ),
-            IconButton(
-              icon: FaIcon(FontAwesomeIcons.gem),
-              iconSize: 20,
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/treasure");
-              },
-            ),
+            // IconButton(
+            //   icon: FaIcon(FontAwesomeIcons.gem),
+            //   iconSize: 20,
+            //   onPressed: () {
+            //     Navigator.pushReplacementNamed(context, "/treasure");
+            //   },
+            // ),
             IconButton(
               icon: Icon(Icons.share),
               onPressed: () {},
