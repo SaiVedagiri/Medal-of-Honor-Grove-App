@@ -207,26 +207,50 @@ class _HomePageState extends State<HomePage> {
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: FaIcon(FontAwesomeIcons.gem),
                       iconSize: 20,
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/treasure");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]
@@ -238,19 +262,37 @@ class _HomePageState extends State<HomePage> {
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]),
@@ -560,7 +602,13 @@ class _VideoPageState extends State<VideoPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -570,20 +618,38 @@ class _VideoPageState extends State<VideoPage> {
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: FaIcon(FontAwesomeIcons.gem),
                       iconSize: 20,
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/treasure");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]
@@ -591,7 +657,13 @@ class _VideoPageState extends State<VideoPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -601,13 +673,25 @@ class _VideoPageState extends State<VideoPage> {
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]),
@@ -1057,13 +1141,25 @@ class _MapPageState extends State<MapPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -1074,13 +1170,25 @@ class _MapPageState extends State<MapPage> {
                       icon: FaIcon(FontAwesomeIcons.gem),
                       iconSize: 20,
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/treasure");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]
@@ -1088,13 +1196,25 @@ class _MapPageState extends State<MapPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -1104,7 +1224,13 @@ class _MapPageState extends State<MapPage> {
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]),
@@ -1502,19 +1628,37 @@ class _TreasurePageState extends State<TreasurePage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -1525,7 +1669,13 @@ class _TreasurePageState extends State<TreasurePage> {
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]
@@ -1533,25 +1683,49 @@ class _TreasurePageState extends State<TreasurePage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]),
@@ -1944,19 +2118,37 @@ class _SocialPageState extends State<SocialPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -1967,7 +2159,13 @@ class _SocialPageState extends State<SocialPage> {
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]
@@ -1979,19 +2177,37 @@ class _SocialPageState extends State<SocialPage> {
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.share),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/links");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                   ]),
@@ -2260,26 +2476,50 @@ class LinksPageState extends State<LinksPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: FaIcon(FontAwesomeIcons.gem),
                       iconSize: 20,
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/treasure");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -2291,19 +2531,37 @@ class LinksPageState extends State<LinksPage> {
                     IconButton(
                       icon: Icon(Icons.home),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.videocam),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/video");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
                       icon: Icon(Icons.map),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/map");
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
