@@ -3,6 +3,7 @@ let scavenger = [];
 let editScavenger = true;
 let editRow = false;
 let missing = [];
+let treasure = true;
 
 if (sessionStorage.getItem("valid") != "true") {
     window.location.href = "login.html"
@@ -37,6 +38,23 @@ if (sessionStorage.getItem("valid") != "true") {
         scavenger.push(temp);
         LocationsPopulate();
         scavengerPopulate();
+    });
+
+    firebase.database().ref().on("child_added", function(snapshot, prevChildKey) {
+        var newPost = snapshot.val();
+        if (snapshot.key == "displayTreasure") {
+            if (newPost == "true") {
+                treasure = true
+            } else {
+                treasure = false
+            }
+            treasureWord = "disabled";
+            if (treasure) {
+                treasureWord = "enabled";
+            }
+            document.getElementById("huntbtn").innerHTML = `<button class="btn btn-primary text-center" type="button">Toggle Hunt (Currently ${treasureWord})</button>`
+        }
+        
     });
 }
 
@@ -314,6 +332,16 @@ function ScavengerEditPopulate() {
     $("#scavengerTable tbody").append(
         tablestring
     );
+}
+
+async function toggleHunt() {
+    treasure = !treasure
+    await firebase.database().ref("displayTreasure").set(treasure);
+    treasureWord = "disabled";
+    if (treasure) {
+        treasureWord = "enabled";
+    }
+    document.getElementById("huntbtn").innerHTML = `<button class="btn btn-primary text-center" type="button">Toggle Hunt (Currently ${treasureWord})</button>`
 }
 
 async function editClick() {

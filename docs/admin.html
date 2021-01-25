@@ -77,9 +77,11 @@
         </div>
     </section>
     <section style="background-color: #e83636;">
-        <h1 class="text-center">Scavenger Hunt</h1>
-        <div class="container text-center" id="editbtn" onclick="editClick()"><button class="btn btn-primary
+        <div><h1 class="text-center">Scavenger Hunt</h1></div>
+        <div class="container text-center" id="editbtn" onclick="editClick()"><button id="editbtn" onclick="editClick()" class="btn btn-primary
                     text-center" type="button">EDIT</button></div>
+        <div class="container text-center" id="huntbtn" onclick="toggleHunt()"><button class="btn btn-primary
+                        text-center" type="button">Toggle Hunt</button></div>
         <div class="table-responsive">
             <table class="table" id="scavengerTable">
                 <thead>
