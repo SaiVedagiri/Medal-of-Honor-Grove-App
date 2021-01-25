@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -27,6 +27,8 @@
 	<key>NSCameraUsageDescription</key>
 	<string>The MOH Grove app needs to access your camera for taking pictures and scanning QR codes.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The MOH Grove app needs to access your current location to display your location on the Grove and provide live location info updates as you move around the site.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The MOH Grove app needs to access your current location to display your location on the Grove and provide live location info updates as you move around the site.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>The MOH Grove app needs to access your microphone to record a photograph.</string>
