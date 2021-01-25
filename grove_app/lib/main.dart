@@ -112,6 +112,8 @@ class _HomePageState extends State<HomePage> {
     }
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
+
+    setState(() {});
   }
 
   Future<String> createAlertDialog(
