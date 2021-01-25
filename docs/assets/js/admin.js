@@ -281,7 +281,25 @@ function scavengerPopulate() {
     );
 }
 
+function sortScavenger() {
+    var least = [["zzzzzzzzzzzzzz"]];
+    index = 0;
+    for (var x = 0; x<scavenger.length; x++) {
+        for (var y = x; y<scavenger.length; y++) {
+            if (scavenger[y][0] < least[0][0]) {
+                least = scavenger[y];
+                index = y;
+            }
+        }
+        scavenger[index] = scavenger[x];
+        scavenger[x] = least;
+        var least = [["zzzzzzzzzzzzzz"]];
+    }
+}
+
 function ScavengerEditPopulate() {
+    sortScavenger();
+
     $("#scavengerTable tr").remove();
     var tablestring = "";
     tablestring += '<tr class="text-center"><th style="width: 166px;">Location Name</th><th style="width: 204px;">Scavenger Hunt Location</th></tr>';
