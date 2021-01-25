@@ -17,6 +17,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:photo_view/photo_view.dart';
 
 var _firebaseRef = FirebaseDatabase().reference();
 FlutterTts flutterTts = FlutterTts();
@@ -31,6 +32,7 @@ var linksData;
 var firstCamera;
 var videoId;
 var distanceLength;
+var displayTreasure;
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -59,7 +61,8 @@ class MyApp extends StatelessWidget {
           "/": (_) => HomePage(),
           "/video": (_) => VideoPage(),
           "/map": (_) => MapPage(),
-          // "/treasure": (_) => TreasurePage(),
+          "/mapList": (_) => MapListPage(),
+          "/treasure": (_) => TreasurePage(),
           "/links": (_) => LinksPage(),
         });
   }
@@ -99,6 +102,9 @@ class _HomePageState extends State<HomePage> {
     });
     ref.child("distance").once().then((DataSnapshot data) {
       distanceLength = data.value;
+    });
+    ref.child("displayTreasure").once().then((DataSnapshot data) {
+      displayTreasure = data.value;
     });
     prefs = await SharedPreferences.getInstance();
     if (prefs.getInt('treasureNum') == null) {
@@ -188,40 +194,64 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.videocam),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/video");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/map");
-              },
-            ),
-            // IconButton(
-            //   icon: FaIcon(FontAwesomeIcons.gem),
-            //   iconSize: 20,
-            //   onPressed: () {
-            //     Navigator.pushReplacementNamed(context, "/treasure");
-            //   },
-            // ),
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/links");
-              },
-            ),
-          ],
-        ),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: displayTreasure == "true"
+                ? <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.gem),
+                      iconSize: 20,
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/treasure");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]
+                : <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]),
       ),
       body: Center(
         child: Column(
@@ -261,25 +291,123 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(right: 20.0),
-                    child: Icon(Icons.web),
+                    child: Icon(Icons.map_outlined),
                   ),
-                  Text("Visit Website")
+                  Text("View Map")
                 ],
               ),
               onPressed: () async {
-                await widget.browser.open(
-                    url: linksData["website"],
-                    options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(
-                            addDefaultShareMenuItem: true,
-                            keepAliveEnabled: true),
-                        ios: IOSSafariOptions(
-                            dismissButtonStyle:
-                                IOSSafariDismissButtonStyle.CLOSE,
-                            presentationStyle:
-                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) => new MapImagePage()));
               },
             )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MapImagePage extends StatefulWidget {
+  MapImagePage({Key key}) : super(key: key);
+
+  @override
+  _MapImagePageState createState() => _MapImagePageState();
+}
+
+class _MapImagePageState extends State<MapImagePage> {
+  Future<String> createAlertDialog(
+      BuildContext context, String title, String body) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              title: Text(title),
+              content: Text(body),
+              actions: <Widget>[
+                MaterialButton(
+                  elevation: 5.0,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                )
+              ]);
+        });
+  }
+
+  Future<String> helpContext(BuildContext context, String title, Widget body) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              title: Text(title),
+              content: body,
+              actions: <Widget>[
+                MaterialButton(
+                  elevation: 5.0,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                )
+              ]);
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Map"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () {
+              helpContext(
+                  context,
+                  "Help",
+                  Text.rich(
+                    TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Map Page\n',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
+                        TextSpan(
+                          text: 'View the map of the Grove.\n',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ));
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              child: PhotoView(
+                imageProvider: const AssetImage("assets/map.jpg"),
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered * 2.5,
+                initialScale: PhotoViewComputedScale.contained,
+              ),
+              height: MediaQuery.of(context).size.height - 128,
+            ),
           ],
         ),
       ),
@@ -423,40 +551,64 @@ class _VideoPageState extends State<VideoPage> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.videocam),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/map");
-              },
-            ),
-            // IconButton(
-            //   icon: FaIcon(FontAwesomeIcons.gem),
-            //   iconSize: 20,
-            //   onPressed: () {
-            //     Navigator.pushReplacementNamed(context, "/treasure");
-            //   },
-            // ),
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/links");
-              },
-            ),
-          ],
-        ),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: displayTreasure == "true"
+                ? <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.gem),
+                      iconSize: 20,
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/treasure");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]
+                : <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]),
       ),
       body: Center(
         child: Column(
@@ -801,6 +953,18 @@ class _MapPageState extends State<MapPage> {
         title: Text("Grove Map"),
         actions: <Widget>[
           IconButton(
+            icon: Icon(Icons.list_alt_outlined),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new MapListPage(
+                            latitude: locationData.latitude,
+                            longitude: locationData.longitude,
+                          )));
+            },
+          ),
+          IconButton(
               icon: Icon(Icons.camera_alt),
               onPressed: () async {
                 try {
@@ -884,40 +1048,64 @@ class _MapPageState extends State<MapPage> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.videocam),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/video");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {},
-            ),
-            // IconButton(
-            //   icon: FaIcon(FontAwesomeIcons.gem),
-            //   iconSize: 20,
-            //   onPressed: () {
-            //     Navigator.pushReplacementNamed(context, "/treasure");
-            //   },
-            // ),
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/links");
-              },
-            ),
-          ],
-        ),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: displayTreasure == "true"
+                ? <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.gem),
+                      iconSize: 20,
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/treasure");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]
+                : <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]),
       ),
       body: Column(
         children: <Widget>[
@@ -936,6 +1124,260 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MapListPage extends StatefulWidget {
+  MapListPage({Key key, this.latitude, this.longitude}) : super(key: key);
+
+  final double latitude;
+  final double longitude;
+
+  @override
+  _MapListPageState createState() => _MapListPageState();
+}
+
+class _MapListPageState extends State<MapListPage> {
+  List keys;
+
+  initState() {
+    super.initState();
+    initStateFunction();
+  }
+
+  double deg2rad(deg) {
+    return deg * (pi / 180);
+  }
+
+  double getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radius of the earth in km
+    print(lat1);
+    print(lon1);
+    print(lat2);
+    print(lon2);
+    var dLat = deg2rad(lat2 - lat1); // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * sin(dLon / 2) * sin(dLon / 2);
+    var c = 2 * atan2(sqrt(a), sqrt(1 - a)) * 0.62137119;
+    var d = R * c; // Distance in miles
+    return d;
+  }
+
+  initStateFunction() async {
+    if (firebaseData != null) {
+      keys = firebaseData.keys.toList();
+      keys.sort((a, b) => getDistanceFromLatLonInMiles(
+              widget.latitude,
+              widget.longitude,
+              firebaseData[a]["latitude"],
+              firebaseData[a]["longitude"])
+          .compareTo(getDistanceFromLatLonInMiles(
+              widget.latitude,
+              widget.longitude,
+              firebaseData[b]["latitude"],
+              firebaseData[b]["longitude"])));
+    }
+  }
+
+  Future<String> helpContext(BuildContext context, String title, Widget body) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              title: Text(title),
+              content: body,
+              actions: <Widget>[
+                MaterialButton(
+                  elevation: 5.0,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                )
+              ]);
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Location List"),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                showSearch(
+                    context: context,
+                    delegate: Search(keys, widget.latitude, widget.longitude));
+              }),
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () {
+              helpContext(
+                  context,
+                  "Help",
+                  Text.rich(
+                    TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Location List Page\n',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
+                        TextSpan(
+                          text:
+                              'View the list of locations in order of proximity. Use the search tool to find specific locations.\n',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ));
+            },
+          ),
+        ],
+      ),
+      body: ListView.builder(
+          itemCount: keys.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+              child: Card(
+                child: ListTile(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new DetailsPage(
+                                title: firebaseData[keys[index]]["name"],
+                                info: firebaseData[keys[index]]["text"],
+                                url: firebaseData[keys[index]]["url"])));
+                  },
+                  title: Text(firebaseData[keys[index]]["name"]),
+                  subtitle: Text(getDistanceFromLatLonInMiles(
+                              widget.latitude,
+                              widget.longitude,
+                              firebaseData[keys[index]]["latitude"],
+                              firebaseData[keys[index]]["longitude"])
+                          .toStringAsFixed(2) +
+                      " miles away"),
+                ),
+              ),
+            );
+          }),
+    );
+  }
+}
+
+class Search extends SearchDelegate {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return <Widget>[
+      IconButton(
+        icon: Icon(Icons.close),
+        onPressed: () {
+          query = "";
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  String selectedResult = "";
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container(
+      child: Center(
+        child: Text(selectedResult),
+      ),
+    );
+  }
+
+  double deg2rad(deg) {
+    return deg * (pi / 180);
+  }
+
+  double getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radius of the earth in km
+    print(lat1);
+    print(lon1);
+    print(lat2);
+    print(lon2);
+    var dLat = deg2rad(lat2 - lat1); // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * sin(dLon / 2) * sin(dLon / 2);
+    var c = 2 * atan2(sqrt(a), sqrt(1 - a)) * 0.62137119;
+    var d = R * c; // Distance in miles
+    return d;
+  }
+
+  final List listExample;
+  final double latitude;
+  final double longitude;
+
+  Search(this.listExample, this.latitude, this.longitude);
+
+  List<String> recentList = [];
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List suggestionList = [];
+    suggestionList.addAll(listExample.where(
+      // In the false case
+      (element) => firebaseData[element]["name"]
+          .toLowerCase()
+          .contains(query.toLowerCase()),
+    ));
+
+    return ListView.builder(
+      itemCount: suggestionList.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+          child: Card(
+            child: ListTile(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) => new DetailsPage(
+                            title: firebaseData[suggestionList[index]]["name"],
+                            info: firebaseData[suggestionList[index]]["text"],
+                            url: firebaseData[suggestionList[index]]["url"])));
+              },
+              title: Text(firebaseData[suggestionList[index]]["name"]),
+              subtitle: Text(getDistanceFromLatLonInMiles(
+                          latitude,
+                          longitude,
+                          firebaseData[suggestionList[index]]["latitude"],
+                          firebaseData[suggestionList[index]]["longitude"])
+                      .toStringAsFixed(2) +
+                  " miles away"),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -1051,40 +1493,66 @@ class _TreasurePageState extends State<TreasurePage> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.videocam),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/video");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/map");
-              },
-            ),
-            IconButton(
-              icon: FaIcon(FontAwesomeIcons.gem),
-              iconSize: 20,
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/links");
-              },
-            ),
-          ],
-        ),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: displayTreasure == "true"
+                ? <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.gem),
+                      iconSize: 20,
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]
+                : <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]),
       ),
       body: Center(
         child: Column(
@@ -1467,40 +1935,64 @@ class _SocialPageState extends State<SocialPage> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.videocam),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/video");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/map");
-              },
-            ),
-            IconButton(
-              icon: FaIcon(FontAwesomeIcons.gem),
-              iconSize: 20,
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/links");
-              },
-            ),
-          ],
-        ),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: displayTreasure == "true"
+                ? <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.gem),
+                      iconSize: 20,
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]
+                : <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/links");
+                      },
+                    ),
+                  ]),
       ),
       body: Center(
         child: Column(
@@ -1759,40 +2251,64 @@ class LinksPageState extends State<LinksPage> {
       appBar: AppBar(title: Text('Links')),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.videocam),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/video");
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/map");
-              },
-            ),
-            // IconButton(
-            //   icon: FaIcon(FontAwesomeIcons.gem),
-            //   iconSize: 20,
-            //   onPressed: () {
-            //     Navigator.pushReplacementNamed(context, "/treasure");
-            //   },
-            // ),
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {},
-            ),
-          ],
-        ),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: displayTreasure == "true"
+                ? <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.gem),
+                      iconSize: 20,
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/treasure");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {},
+                    ),
+                  ]
+                : <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.home),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.videocam),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/video");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.map),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/map");
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {},
+                    ),
+                  ]),
       ),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
