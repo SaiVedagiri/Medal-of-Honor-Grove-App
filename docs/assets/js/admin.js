@@ -354,7 +354,7 @@ function ScavengerEditPopulate() {
 
 async function toggleHunt() {
     treasure = !treasure
-    await firebase.database().ref("displayTreasure").set(treasure);
+    await firebase.database().ref("displayTreasure").set(`${treasure.toString()}`);
     treasureWord = "disabled";
     if (treasure) {
         treasureWord = "enabled";
