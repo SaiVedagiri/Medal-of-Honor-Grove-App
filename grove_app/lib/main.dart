@@ -210,7 +210,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -222,7 +223,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -235,7 +237,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                TreasurePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -247,7 +250,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -265,7 +269,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -277,7 +282,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -289,7 +295,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -605,7 +612,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -621,7 +629,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -634,7 +643,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                TreasurePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -646,7 +656,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -660,7 +671,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -676,7 +688,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -688,7 +701,8 @@ class _VideoPageState extends State<VideoPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -757,7 +771,24 @@ class _MapPageState extends State<MapPage> {
     }
     permissionGranted = await location.hasPermission();
     if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text("Location Permission"),
+                content: Text(
+                    "This app collects location data to provide relavant notifications regarding your proximity to landmarks in the Medal of Honor Grove even when the app is closed or not in use."),
+                actions: <Widget>[
+                  MaterialButton(
+                    elevation: 5.0,
+                    onPressed: () async {
+                      permissionGranted = await location.requestPermission();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("OK"),
+                  ),
+                ]);
+          });
       if (permissionGranted != PermissionStatus.granted) {
         return;
       }
@@ -1144,7 +1175,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1156,7 +1188,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1173,7 +1206,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                TreasurePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1185,7 +1219,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1199,7 +1234,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1211,7 +1247,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1227,7 +1264,8 @@ class _MapPageState extends State<MapPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1631,7 +1669,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1643,7 +1682,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1655,7 +1695,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1672,7 +1713,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1686,7 +1728,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1698,7 +1741,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1710,7 +1754,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -1722,7 +1767,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2121,7 +2167,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2133,7 +2180,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2145,7 +2193,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2162,7 +2211,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2180,7 +2230,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2192,7 +2243,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2204,7 +2256,8 @@ class _SocialPageState extends State<SocialPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => LinksPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                LinksPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2479,7 +2532,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2491,7 +2545,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2503,7 +2558,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2516,7 +2572,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => TreasurePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                TreasurePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2534,7 +2591,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => HomePage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                HomePage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2546,7 +2604,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => VideoPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                VideoPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -2558,7 +2617,8 @@ class LinksPageState extends State<LinksPage> {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => MapPage(),
+                            pageBuilder: (context, animation1, animation2) =>
+                                MapPage(),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
