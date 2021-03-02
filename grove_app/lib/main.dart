@@ -12,8 +12,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:location/location.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:camera/camera.dart';
-import 'package:path/path.dart' show join;
-import 'package:path_provider/path_provider.dart';
+// import 'package:path/path.dart' show join;
+// import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -1085,11 +1085,11 @@ class _MapPageState extends State<MapPage> {
               icon: Icon(Icons.camera_alt),
               onPressed: () async {
                 try {
-                  String qrResult = await BarcodeScanner.scan();
-                  result = qrResult;
+                  ScanResult qrResult = await BarcodeScanner.scan();
+                  result = qrResult.rawContent;
                   var done = false;
                   firebaseData.keys.forEach((var key) {
-                    if (firebaseData[key]["qr-id"] == qrResult) {
+                    if (firebaseData[key]["qr-id"] == result) {
                       done = true;
                       var locationName = firebaseData[key]["name"];
                       var locationDetails = firebaseData[key]["text"];
@@ -1108,7 +1108,7 @@ class _MapPageState extends State<MapPage> {
                         "This QR code is not recognized by the Grove app. Please try again.");
                   }
                 } on PlatformException catch (ex) {
-                  if (ex.code == BarcodeScanner.CameraAccessDenied) {
+                  if (ex.code == BarcodeScanner.cameraAccessDenied) {
                     setState(() {
                       createAlertDialog(context, "Scan QR",
                           "Please enable camera permissions for Grove App.");
@@ -1815,8 +1815,8 @@ class _TreasurePageState extends State<TreasurePage> {
                         label: Text("Scan QR"),
                         onPressed: () async {
                           try {
-                            String qrResult = await BarcodeScanner.scan();
-                            result = qrResult;
+                            ScanResult qrResult = await BarcodeScanner.scan();
+                            result = qrResult.rawContent;
                             if (result != locationData["qr-id"]) {
                               createAlertDialog(context, "Incorrect QR Code",
                                   "This QR code does not match ${locationData["name"]}. Please try again.");
@@ -1831,7 +1831,7 @@ class _TreasurePageState extends State<TreasurePage> {
                                               json.encode(locationData))));
                             }
                           } on PlatformException catch (ex) {
-                            if (ex.code == BarcodeScanner.CameraAccessDenied) {
+                            if (ex.code == BarcodeScanner.cameraAccessDenied) {
                               setState(() {
                                 createAlertDialog(context, "Scan QR",
                                     "Please enable camera permissions for Grove App.");
@@ -2384,22 +2384,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
             // Construct the path where the image should be saved using the
             // pattern package.
-            final path = join(
-              // Store the picture in the temp directory.
-              // Find the temp directory using the `path_provider` plugin.
-              (await getTemporaryDirectory()).path,
-              '${DateTime.now()}.png',
-            );
+            // final path = join(
+            //   // Store the picture in the temp directory.
+            //   // Find the temp directory using the `path_provider` plugin.
+            //   (await getTemporaryDirectory()).path,
+            //   '${DateTime.now()}.png',
+            // );
 
             // Attempt to take a picture and log where it's been saved.
-            await _controller.takePicture(path);
+            XFile file = await _controller.takePicture();
 
             // If the picture was taken, display it on a new screen.
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => DisplayPictureScreen(
-                    imagePath: path,
+                    imagePath: file.path,
                     socialText: widget.socialText,
                     locationName: widget.locationName),
               ),
