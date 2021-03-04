@@ -12,6 +12,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:location/location.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:camera/camera.dart';
+
 // import 'package:path/path.dart' show join;
 // import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
@@ -19,7 +20,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:photo_view/photo_view.dart';
 
-var _firebaseRef = FirebaseDatabase().reference();
 FlutterTts flutterTts = FlutterTts();
 var result = "";
 var popupShown = false;
@@ -110,8 +110,6 @@ class _HomePageState extends State<HomePage> {
     if (prefs.getInt('treasureNum') == null) {
       prefs.setInt('treasureNum', 1);
     }
-    final cameras = await availableCameras();
-    final firstCamera = cameras.first;
 
     setState(() {});
   }
@@ -335,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -475,10 +473,6 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
   YoutubePlayerController _controller;
-  PlayerState _playerState;
-  YoutubeMetaData _videoMetaData;
-  double _volume = 100;
-  bool _muted = false;
   bool _isPlayerReady = false;
 
   @override
@@ -496,16 +490,11 @@ class _VideoPageState extends State<VideoPage> {
           enableCaption: false,
           hideControls: false),
     );
-    _videoMetaData = const YoutubeMetaData();
-    _playerState = PlayerState.unknown;
   }
 
   void listener() {
     if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
-      setState(() {
-        _playerState = _controller.value.playerState;
-        _videoMetaData = _controller.metadata;
-      });
+      setState(() {});
     }
   }
 
@@ -771,24 +760,7 @@ class _MapPageState extends State<MapPage> {
     }
     permissionGranted = await location.hasPermission();
     if (permissionGranted == PermissionStatus.denied) {
-      await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text("Location Permission"),
-                content: Text(
-                    "This app collects location data to provide relavant notifications regarding your proximity to landmarks in the Medal of Honor Grove even when the app is closed or not in use."),
-                actions: <Widget>[
-                  MaterialButton(
-                    elevation: 5.0,
-                    onPressed: () async {
-                      permissionGranted = await location.requestPermission();
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("OK"),
-                  ),
-                ]);
-          });
+      permissionGranted = await location.requestPermission();
       if (permissionGranted != PermissionStatus.granted) {
         return;
       }
@@ -877,6 +849,7 @@ class _MapPageState extends State<MapPage> {
     location.onLocationChanged.listen((LocationData currentLocation) async {
       try {
         LocationData tempLocationData = await location.getLocation();
+        locationData = tempLocationData;
 
         firebaseData.keys.forEach((var key) {
           if (getDistanceFromLatLonInKm(
@@ -1117,7 +1090,7 @@ class _MapPageState extends State<MapPage> {
                     setState(() {
                       result = "Unknown Error $ex";
                       createAlertDialog(
-                          context, "Scan QR", "Unkown Error Occured: $ex");
+                          context, "Scan QR", "Unknown Error Occurred: $ex");
                     });
                   }
                 } on FormatException {
@@ -1131,7 +1104,7 @@ class _MapPageState extends State<MapPage> {
                   setState(() {
                     result = "Unknown Error $ex";
                     createAlertDialog(
-                        context, "Scan QR", "Unkown Error Occured: $ex");
+                        context, "Scan QR", "Unknown Error Occurred: $ex");
                   });
                 }
               }),
@@ -1840,7 +1813,7 @@ class _TreasurePageState extends State<TreasurePage> {
                               setState(() {
                                 result = "Unknown Error $ex";
                                 createAlertDialog(context, "Scan QR",
-                                    "Unkown Error Occured: $ex");
+                                    "Unknown Error Occurred: $ex");
                               });
                             }
                           } on FormatException {
@@ -1854,7 +1827,7 @@ class _TreasurePageState extends State<TreasurePage> {
                             setState(() {
                               result = "Unknown Error $ex";
                               createAlertDialog(context, "Scan QR",
-                                  "Unkown Error Occured: $ex");
+                                  "Unknown Error Occurred: $ex");
                             });
                           }
                         }),
@@ -2041,7 +2014,7 @@ class _DetailsPageState extends State<DetailsPage> {
               ),
               Opacity(
                 opacity: widget.url == null ? 0.0 : 1.0,
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -2493,7 +2466,6 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
     print("ChromeSafari browser opened");
   }
 
-  @override
   void onLoaded() {
     print("ChromeSafari browser loaded");
   }
@@ -2636,7 +2608,7 @@ class LinksPageState extends State<LinksPage> {
         child: SingleChildScrollView(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
               Widget>[
-            FlatButton(
+            TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -2662,7 +2634,7 @@ class LinksPageState extends State<LinksPage> {
               },
             ),
             Divider(color: Colors.black),
-            FlatButton(
+            TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -2688,7 +2660,7 @@ class LinksPageState extends State<LinksPage> {
               },
             ),
             Divider(color: Colors.black),
-            FlatButton(
+            TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -2714,7 +2686,7 @@ class LinksPageState extends State<LinksPage> {
               },
             ),
             Divider(color: Colors.black),
-            FlatButton(
+            TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -2740,7 +2712,7 @@ class LinksPageState extends State<LinksPage> {
               },
             ),
             Divider(color: Colors.black),
-            FlatButton(
+            TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -2766,7 +2738,7 @@ class LinksPageState extends State<LinksPage> {
               },
             ),
             Divider(color: Colors.black),
-            FlatButton(
+            TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
