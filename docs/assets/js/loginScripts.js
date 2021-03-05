@@ -29,6 +29,12 @@ async function signInEmail(event) {
     }
 }
 
+async function resetPassword(event) {
+    event.preventDefault();
+
+    window.location.href = "reset.html";
+}
+
 function error(error){
     document.querySelector("#error").innerHTML = error;
 }
